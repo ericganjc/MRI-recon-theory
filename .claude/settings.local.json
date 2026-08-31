@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "Bash(xelatex -interaction=nonstopmode main.tex)",
+      "Bash(grep -n \"\\\\\\\\\\\\\\\\label\\\\\\\\|\\\\\\\\\\\\\\\\boxed\\\\\\\\|\\\\\\\\\\\\\\\\begin{equation}\\\\\\\\|\\\\\\\\\\\\\\\\begin{align}\" main.tex)"
+    ]
+  }
+}

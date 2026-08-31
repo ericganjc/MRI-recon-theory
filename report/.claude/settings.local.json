@@ -1,0 +1,44 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(ls ~/.claude/projects/D--GanJiacheng-files-PhD-MRI----------/ 2>/dev/null | head -10)",
+      "Read(//c/Users/15611/.claude/projects/D--GanJiacheng-files-PhD-MRI----------/**)",
+      "Bash(ls ~/.claude/projects/D--HuaweiMoveData-Users-15611-OneDrive---/ 2>/dev/null | head -10)",
+      "Read(//c/Users/15611/.claude/projects/D--HuaweiMoveData-Users-15611-OneDrive---/**)",
+      "Read(//c//**)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Users/15611/AppData/Local/Programs/**)",
+      "Bash(command -v latexmk pdflatex lualatex tectonic)",
+      "Bash(where xelatex *)",
+      "Read(//d:/**)",
+      "Bash(cmd //c \"where xelatex\")",
+      "Bash(cmd //c \"where pdflatex\")",
+      "Bash(\"D:/GanJiacheng/apps/texlive/2025/bin/windows/xelatex.exe\" -interaction=nonstopmode -halt-on-error main.tex)",
+      "Bash(echo \"pass1 exit: $?\")",
+      "Bash(echo \"pass2 exit: $?\")",
+      "Bash(cd \"d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap2\" && rm -f compile1.log compile2.log compile3.log compile4.log && ls)",
+      "Bash(python -c \"import os; [os.remove\\(f\\) for f in ['compile1.log','compile2.log','compile3.log','compile4.log'] if os.path.exists\\(f\\)]; print\\(sorted\\(os.listdir\\('.'\\)\\)\\)\")",
+      "Bash(\"D:/GanJiacheng/apps/anaconda/python.exe\" -c \"import os; [os.remove\\(f\\) for f in ['compile1.log','compile2.log','compile3.log','compile4.log'] if os.path.exists\\(f\\)]; print\\(sorted\\(os.listdir\\('.'\\)\\)\\)\")",
+      "Bash(ls \"D:/GanJiacheng/apps\" | head -40)",
+      "Read(//d/GanJiacheng/apps/**)",
+      "Bash(\"D:/GanJiacheng/apps/msys2/usr/bin/rm.exe\" -f \"d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap2/compile1.log\" \"d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap2/compile2.log\" \"d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap2/compile3.log\" \"d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap2/compile4.log\")",
+      "Bash(D:/GanJiacheng/apps/texlive/2025/bin/windows/xelatex.exe -interaction=nonstopmode -halt-on-error main.tex)",
+      "Bash(echo \"exit codes: $?\")",
+      "Bash(D:/GanJiacheng/apps/msys2/usr/bin/rm.exe \"d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap2/compile1.log\" \"d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap2/compile2.log\")",
+      "Bash(grep -c \"\\\\\\\\\\\\\\\\cite\" main.tex)",
+      "Bash(ls \"D:\\\\GanJiacheng\\\\files\\\\PhD\\\\MRI图像重构理论方法应用\")",
+      "Read(//d/GanJiacheng/files/PhD/MRI图像重构理论方法应用/**)",
+      "Bash(python -c ' *)",
+      "Bash(pip install *)",
+      "Bash(python -c \"import pypdf; print\\('ok', pypdf.__version__\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 python -c ' *)",
+      "Read(//tmp/**)",
+      "Bash(PYTHONIOENCODING=utf-8 python \"C:\\\\Users\\\\15611\\\\AppData\\\\Local\\\\Temp\\\\check_algo.py\" \"D:\\\\GanJiacheng\\\\files\\\\PhD\\\\MRI图像重构理论方法应用\\\\report\\\\chap3\\\\main.tex\")",
+      "Bash(echo \"exit=$?\")"
+    ],
+    "additionalDirectories": [
+      "d:\\GanJiacheng\\files\\PhD\\MRI图像重构理论方法应用\\report\\chap2"
+    ]
+  }
+}

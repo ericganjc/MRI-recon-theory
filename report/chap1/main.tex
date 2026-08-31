@@ -1,0 +1,532 @@
+\documentclass[12pt]{article}
+\usepackage{setspace}
+\onehalfspacing 
+
+\usepackage[UTF8]{ctex}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{textcomp}
+\usepackage{makecell}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\usepackage{bm}
+\usepackage{siunitx}
+
+\usepackage[backend=biber, style=numeric, sorting=none]{biblatex}
+\bibliography{references}
+
+\title{从自旋的量子力学描述出发\\从数学推导MRI的物理原理}
+\author{甘嘉程}
+\date{2026年6月}
+
+\usepackage[a4paper,top=1.5cm,bottom=1.5cm,left=1.5cm,right=1.5cm]{geometry}
+\linespread{1.5}
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+本报告基于《Magnetic Resonance Image Reconstruction: Theory, Methods, and Applications》第一章内容，从自旋的量子力学描述出发，通过数学推导梳理了MRI物理原理。报告从自旋角动量本征值的代数求解入手，逐步推导出反常Zeeman效应能级分裂；随后处理系综平均并导出静磁化强度。随后用半经典理论推导Larmor进动方程，求解有效场表达式和共振条件。通过加入弛豫模型，报告建立了完整Bloch方程并进行求解。最后通过Faraday电磁感应定律和梯度编码理论，将FID信号编码为磁化强度空间分布的傅里叶变换。本报告的特点是在考虑基本物理图像的基础上，尽可能通过数学推到实现逻辑和运算自洽，而不满足于定性或半定量物理描述。在撰写报告的过程中，笔者对MRI的物理过程细节有了更深刻、多角度理解。
+\end{abstract}
+
+\section{单自旋的量子力学描述}
+\subsection{自旋角动量本征值的代数解法}
+自旋是粒子的内禀角动量，其算符$\bm{\hat{s}}=\left(\hat{s}_x,\hat{s}_y,\hat{s}_z\right)$满足角动量对易关系
+\begin{align}
+    \left[\hat{s}_i,\hat{s}_j\right]&=i\hbar\epsilon_{ijk}\hat{s}_k\\
+    \left[\hat{s}^2,\hat{s}_i\right]&=0 \label{equ:s}\\
+    (i,j,k&=x,y,z)\nonumber
+\end{align}
+接下来用代数方法推导自旋算符的本征值。
+
+由\autoref{equ:s}可知，$\hat{s}^2$、$\hat{s}_z$存在共同本征态。设其为$\left|sm_s\right\rangle$，满足
+\begin{align}
+    \hat{s}^2\left|sm_s\right\rangle&=\lambda\hbar^2\left|sm_s\right\rangle\\
+    \hat{s}_z\left|sm_s\right\rangle&=m_s\hbar\left|sm_s\right\rangle
+\end{align}
+其中$\lambda$和$m_s$是待求的本征值（实数）。
+
+定义升降算符
+\begin{equation}
+    \hat{s}_\pm=\hat{s}_x\pm i\hat{s}_y
+\end{equation}
+又对易关系\autoref{equ:s}得出
+\begin{equation}
+    \left[\hat{s}_z,\hat{s}_\pm\right]=\pm\hbar\hat{s}_\pm
+    \label{equ:spm}
+\end{equation}
+将\autoref{equ:spm}作用于$\left|sm_s\right\rangle$态，可得
+\begin{equation}
+    \hat{s}_z\left(\hat{s}_\pm\left|sm_s\right\rangle\right)=(m\hbar\pm \hbar)\left(\hat{s}_\pm\left|sm_s\right\rangle\right)
+\end{equation}
+说明$\hat{s}_\pm\left|sm_s\right\rangle$也是$\hat{s}_z$的本征态，且$\hat{s}_\pm$作用一次使$\hat{s}_z$的本征值变为$(m\pm1)\hbar$。
+
+类比轨道角动量，我们知道磁量子数$s$的取值不能超过角量子数$l$的范围，在自旋角动量中也有类似的限制。接下来，我们利用$\hat{s}^2$的正定性限制$m_s$的取值范围。$\hat{s}^2$在本征态表象下的平均值
+\begin{equation}
+    \langle\hat{s}^2\rangle=\langle\hat{s}_x^2+\hat{s}_y^2+\hat{s}_z^2\rangle=\langle\hat{s}_x^2+\hat{s}_y^2\rangle+m^2\hbar^2=\lambda\hbar^2
+\end{equation}
+因为算符$\hat{s}_x^2+\hat{s}_y^2$的期望值非负，所以
+\begin{equation}
+    m_s^2\hbar^2\leq\lambda\hbar^2\quad\Longrightarrow\quad m_s^2\leq\lambda
+\end{equation}
+因此，$m_s$存在最大值和最小值，分别设为$m_{s,\max}$、$m_{s,\min}$。
+
+根据升降算符的性质
+\begin{align}
+    &\hat{s}_+\left|sm_{s,\max}\right\rangle=0\\
+    &\hat{s}_-\left|sm_{s,\min}\right\rangle=0\\
+    &\hat{s}_\pm\hat{s}_\mp=\hat{s}^2-\hat{s}_z^2\pm\hbar\hat{s}_z
+\end{align}
+可得
+\begin{align}
+    \hat{s}_-\left(\hat{s}_+\left|sm_{s,\max}\right\rangle\right)&=(\hat{s}^2-\hat{s}_z^2-\hbar\hat{s}_z)\left|sm_{s,\max}\right\rangle=0\\
+    \hat{s}_+\left(\hat{s}_-\left|sm_{s,\max}\right\rangle\right)&=(\hat{s}^2-\hat{s}_z^2+\hbar\hat{s}_z)\left|sm_{s,\max}\right\rangle=0
+\end{align}
+代入本征值$\lambda\hbar^2$、$m_{s,\max}\hbar$和$m_{s,\min}\hbar$可得
+\begin{align}
+    \lambda&=m_{s,\max}(m_{s,\max}+1) \label{equ:mmax}\\
+    \lambda&=m_{s,\min}(m_{s,\min}-1) \label{equ:mmin}
+\end{align}
+不难发现，将\autoref{equ:mmax}和\autoref{equ:mmin}二式联立
+\begin{equation}
+    m_{s,\max}(m_{s,\max}+1)=m_{s,\min}(m_{s,\min}-1)
+\end{equation}
+经过展开并移项可得
+\begin{equation}
+    (m_{s,\max}+m_{s,\min})(m_{s,\max}-m_{s,\min}+1)=0
+    \label{equ:maxmin}
+\end{equation}
+因为$m_{s,\max}\geq m_{s,\min}$，所以$m_{s,\max}-m_{s,\min}+1\geq1$非零，因此要使\autoref{equ:maxmin}的左边得0须满足
+\begin{equation}
+    m_{s,\max}+m_{s,\min}=0\quad\Longrightarrow\quad m_{s,\min}=-m_{s,\max}
+\end{equation}
+设$m_{s,\max}=s$，则$m_{s,\min}=-s$。由于升降算符每次只能将$m_s$改变1（整数），因此将$m_s$从$m_{s,\min}$升至$m_{s,\max}$经过的运算次数（整数）为
+\begin{equation}
+    m_{s,\max}-m_{s,\min}=s-(-s)=2s=n\quad n=0,1,2,\dots
+\end{equation}
+由此可得自旋量子数$s$的取值
+\begin{equation}
+    s=0,\frac{1}{2},1,\frac{3}{2},2,\dots
+\end{equation}
+
+将$m_{s,\max}ss$代入\autoref{equ:mmax}可得$\lambda=s(s+1)$（若带入\autoref{equ:mmin}也会得到相同结论）。因此，总自旋平方算符$\hat{s}^2$的本征方程
+\begin{equation}
+    \boxed{\hat{s}^2\left|sm_s\right\rangle=s(s+1)\hbar^2\left|sm_s\right\rangle}
+\end{equation}
+自旋投影算符$\hat{s}_z$的本征方程
+\begin{equation}
+    \boxed{\hat{s}_z\left|sm_s\right\rangle=m_s\hbar\left|sm_s\right\rangle}
+\end{equation}
+其中$m_s$共有$2s+1$（与轨道角动量类似）个可取的值，分别是
+\begin{equation}
+    m_s=-s,-s+1,\cdots,s-1,s
+    \label{equ:ms}
+\end{equation}
+至此，我们利用代数方法求解了单粒子系统自旋角动量本征值问题，为自旋磁矩的定义及其与磁场作用的量子力学描述奠定了基础。特别地，对于MRI我们关注质子（$s=1/2$）的自旋，因此在后文中将默认单自旋系统$s=1/2$，$m_s=\pm1/2$。
+
+\subsection{自旋磁矩及其与磁场的作用}
+磁矩算符$\bm{\hat{\mu}}$与自旋角动量算符$\bm{\hat{s}}$呈线性关系
+\begin{equation}
+    \bm{\hat{\mu}}=\gamma\bm{\hat{s}}
+    \label{equ:gamma}
+\end{equation}
+将比例系数$\gamma$定义为旋磁比（对于质子，$\gamma2.675\times10^8\ \mathrm{rad\cdot s^{-1}\cdot T^{-1}}$）。
+
+考虑静磁场$\bm{B}_0=B_0\hat{z}$中的自旋，磁矩与静磁场相互作用的Hamilton量
+\begin{equation}
+    \hat{H}=-\bm{\hat{\mu}}\cdot\bm{B}_0=-\gamma\hat{s}_zB_0
+\end{equation}
+带入$\hat{s}_z$的本征值\autoref{equ:ms}可得，能量（Hamilton量）本征值为
+\begin{equation}
+    E_{m_s}=-\gamma m_sB_0\hbar
+\end{equation}
+由于磁矩与静磁场作用进发生在$\hat{z}$方向上，因此本征能量也仅与自旋角动量在$\hat{z}$方向上的投影（即$m_s$有关），与自旋量子数$s$无关。
+
+\subsection{反常Zeeman效应及能级分裂}
+在$B_0\neq0$的外磁场中，由于磁矩与静磁场的作用，自旋系统简并（$f_n=2s+1$）解除，发生能级分裂，即反常Zeeman效应。对于质子$s=1/2$，$m_s=\pm1/2$，两能级能量分别为
+\begin{align}
+    E_{+1/2}&=-\frac{1}{2}\gamma B_0\hbar\quad（自旋向上）\\
+    E_{-1/2}&=+\frac{1}{2}\gamma B_0\hbar\quad（自旋向下）
+\end{align}
+能量差为
+\begin{equation}
+    \Delta E=E_{-1/2}-E_{+1/2}=\gamma B_0\hbar
+\end{equation}
+结合Larmor角频率$\omega_0=\gamma B_0$\footnote{详见\autoref{chap:larmor_freq}的推导。}，则上式改写为\footnote{勘误：原文p13(1.29)误写为$\Delta E=h\omega_0$，量纲错误（$\mathrm{J·s\times rad/s}=\mathrm{J·rad}$）。若用频率$\nu$（Hz），应为 $\Delta E=h\nu$，但一般使用Lamor频率$omega_0$，对应约化Plank常数$\hbar$。}
+\begin{equation}
+    \boxed{\Delta E=\hbar\omega_0}
+\end{equation}
+
+\section{系综统计与宏观静磁化}
+\subsection{Boltzmann分布}
+考察大量在静磁场中自旋的全同粒子（质子，$s=1/2$），其由两种自旋（能量）状态组成。设$N^+$为低能态$E_{+1/2}$（$m_s=+1/2$自旋向上，与$\bm{B}_0$平行）的布居数，$N^-$为高能态$E_{+1/2}$（$m_s=-1/2$自旋向下，反平行）的布居数。热平衡下，自旋在两能级间的布居数比服从Boltzmann分布
+\begin{equation}
+    \frac{N^+}{N^-}=e^{-\frac{\Delta E}{kT}}=e^{-\frac{\gamma B_0\hbar}{kT}}
+    \label{equ:boltzmann}
+\end{equation}
+在室温及MRI场强（1.5-25T）下，$\gamma B_0\hbar\ll kT$（约$10^{-5}-10^{-4}$量级），上式中的Boltzmann因子可作小量展开。
+
+\subsection{宏观静磁化强度}
+设总核数$N=N^++N^-$，利用\autoref{equ:boltzmann}，可将两个能态下的布居数表述为
+\begin{align}
+    N^-&=\frac{N}{e^{-\Delta E/kT} + 1} \label{equ:Ndown}\\
+    N^+&=\frac{Ne^{-\Delta E/kT}}{e^{-\Delta E/kT}+1} \label{equ:Nup}
+\end{align}
+由于空间对称性，在计算宏观静磁化强度$M_0$时仅需计算所有磁矩在$\bm{B}_0$（即$\hat{z}$）方向上的投影。单个磁矩的$z$分量
+\begin{equation}
+    \mu_z=\gamma m_s\hbar=\frac{1}{2}\gamma\hbar
+    \label{equ:muz}
+\end{equation}
+代入\autoref{equ:Ndown}、\autoref{equ:Nup}和\autoref{equ:muz}，宏观静磁化强度大小可表示为
+\begin{equation}
+    \begin{aligned}
+        M_0&=N^+\mu_z^++N^-\mu_z^-=N^-\mu_z\left(e^{-\frac{\Delta E}{kT}}-1\right)\\
+        &=N\mu_z\cdot\frac{e^{-\frac{\Delta E}{kT}}-1}{e^{-\frac{\Delta E}{kT}}+1}=N\mu_z\tanh\left(\frac{\Delta E}{2kT}\right)\\
+        &\approx\frac{N\mu_z\Delta E}{2kT}=\frac{N\gamma^2\hbar^2}{4kT}B_0
+    \end{aligned}
+\end{equation}
+上式使用Boltzmann因子的小量近似$\tanh(x)\approx x$（$x\ll 1$）。
+
+至此，我们求解出宏观静磁化矢量
+\begin{equation}
+    \boxed{\bm{M}_0\approx\frac{N\gamma^2\hbar^2}{4kT}\bm{B}_0}
+    \label{equ:M0}
+\end{equation}
+
+\section{Larmor进动的经典图像}
+\subsection{磁矩在磁场中的扭矩}
+从经典的角度，我们可以将原子（质子）磁矩组成的宏观磁化强度$\bm{M}(t)$类比为磁偶极矩，其在静磁场$\bm{B}$中的力矩
+\begin{equation}
+    \bm{T}=\bm{M}(t)\times\bm{B}=\dot{\bm{L}}
+\end{equation}
+根据经典力学，该力矩也等于角动量的变化率。磁化强度与宏观角动量通过\autoref{equ:gamma}中定义的旋磁比$\gamma$联系
+\begin{equation}
+    \bm{M}(t)=\gamma\bm{L}(t)
+\end{equation}
+因此
+\begin{equation}
+    \boxed{\dot{\bm{M}}(t)=\gamma\bm{M}(t)\times\bm{B}}
+\end{equation}
+
+\subsection{Larmor频率的推导}\label{chap:larmor_freq}
+考虑静磁场$\bm{B}=B_0\hat{z}$，将$\bm{M}(t)$写成分量形式$\bm{M}=(M_x,M_y,M_z)^T$，令
+\begin{equation}
+    M_{xy}=M_x+iM_y
+    \label{equ:Mxy_def}
+\end{equation}
+则运动方程给出
+\begin{align}
+    \dot{M}_{xy}&=-i\gamma B_0M_{xy} \label{equ:Mxy_equ}\\
+    \dot{M}_z&=0
+\end{align}
+解为
+\begin{align}
+    M_{xy}(t)&=M_{xy}(0)e^{-i\gamma B_0t} \label{equ:Mxy}\\
+    M_z(t)&=\text{const} \label{equ:Mz}
+\end{align}
+故纵向磁化矢量不变，而横向磁化矢量$M_{xy}$以角频率
+\begin{equation}
+    \omega_0=\gamma B_0
+    \label{equ:larmor_freq}
+\end{equation}在$xy$平面内匀速旋转，此即Larmor频率。对于正$\gamma$（质子），进动方向为从$+\hat{z}$俯视顺时针方向（即$\Omega=-\omega_0\hat{z}$）。
+
+\section{旋转坐标系下的射频激发}
+\subsection{旋转坐标系变换与动力学方程}
+在\autoref{chap:larmor_freq}中我们得到了遵循动力学方程的磁化矢量进动，可以分解为平面内的匀速转动（\autoref{equ:Mxy}）和垂直于平面的常矢量（\autoref{equ:Mz}）。为考察磁化矢量在时变磁场$\bm{B}(t)$中的运动，不妨使用随$M_xy$转动的旋转系$(x',y',z')$——将将旋转矩阵$\mathbf{R}(t)$作用于实验室系$(x,y,z)$。相应的变换矩阵为
+\begin{equation}
+    \begin{pmatrix} x \\ y \\ z \end{pmatrix}\mapsto\begin{pmatrix} x' \\ y; \\ z; \end{pmatrix}:\mathbf{R}(t)=\begin{pmatrix}
+    \cos\omega_1t & -\sin\omega_1t & 0 \\
+    \sin\omega_1t & \cos\omega_1t & 0 \\
+    0 & 0 & 1
+    \end{pmatrix}
+    \label{equ:Rmtrx}
+\end{equation}
+旋转方向是从$+\hat{z}$俯视顺时针方向（即$\Omega=-\omega_1\hat{z}$），绕$z$轴以角频率$\omega_1$旋转\footnote{勘误：原文p9(1.14)定义的旋转矩阵为
+\begin{equation}
+    \mathbf{R}(t)=\begin{pmatrix}\cos\omega_1t & \sin\omega_1t & 0 \\ -\sin\omega_1t & \cos\omega_1t & 0 \\ 0 & 0 & 1 \end{pmatrix}
+\end{equation}
+该矩阵的旋转方向是逆时针，与Larmor进动方向相反。在此情况下计算出的p9(1.17)和p10(1.20)式均与代数运算相差一个符号。本文在\autoref{equ:Rmtrx}和接下来的\autoref{equ:B_tot}中重新规定了旋转方向，使旋转系、RF场旋转方向均与Larmor进动方向一致，解决了代数运算与物理图像不匹配的问题。\label{footnote:dir}}。旋转矩阵具有以下性质
+\begin{equation}
+    \mathbf{R}\mathbf{R}^T=\bm{I},\quad\mathrm{det}(\mathbf{R})=1
+\end{equation}
+
+在旋转系中的磁化强度矢量为\footnote{原文中将矢量（如$\bm{M}$等）与张量（如$\mathbf{R}$等）均用加粗正体表示，本文中为作区分，将矢量用加粗斜体表示，张量用加粗正体表示。}
+\begin{equation}
+    \bm{M}'(t)=\mathbf{R}(t)\bm{M}(t)
+    \label{equ:M_rot}
+\end{equation}
+对上式求导\footnote{\textbf{(a)计算$\dot{\mathbf{R}}\mathbf{R}^T\mathbf{M}'$}
+
+由$\dot{\mathbf{R}}=\omega_1\begin{pmatrix} -\sin\omega_1t & -\cos\omega_1t & 0 \\ \cos\omega_1t & -\sin\omega_1t & 0 \\ 0 & 0 & 0 \end{pmatrix}$可得
+\begin{equation}
+    \dot{\mathbf{R}}\mathbf{R}^T=\omega_1\begin{pmatrix}
+    0 & -1 & 0 \\
+    1 & 0 & 0 \\
+    0 & 0 & 0 \end{pmatrix}
+\end{equation}
+作用于$\bm{M}'=(M_x',M_y',M_z')^T$
+\begin{equation}
+    \dot{\mathbf{R}}\mathbf{R}^T\bm{M}'=\omega_1\begin{pmatrix} -M_y' \\ M_x' \\ 0 \end{pmatrix}=-\omega_1\left(\bm{M}'\times\hat{z}\right)
+    \label{equ:key}
+\end{equation}
+
+\textbf{(b)计算$\mathbf{R}(\bm{M}\times\bm{B})$}
+
+利用叉乘性质：$\mathbf{R}(\bm{a}\times\bm{b})=(\mathbf{R}\bm{a})\times(\mathbf{R}\bm{b})$，则
+\begin{equation}
+    \mathbf{R}(\bm{M}\times\bm{B}=(\mathbf{R}\mathbf{R}^T\bm{M}')\times(\mathbf{R}\bm{B})=\bm{M}'\times\bm{B}'
+\end{equation}
+其中$\bm{B}'=\mathbf{R}\bm{B}$。}
+\begin{equation}
+    \begin{aligned}
+        \dot{\bm{M}}'&=\dot{\mathbf{R}}\bm{M}+\mathbf{R}\dot{\bm{M}}=\dot{\mathbf{R}}\mathbf{R}^T\bm{M}'+\gamma\mathbf{R}(\bm{M}\times\bm{B})\\
+        &=-\omega_1(\bm{M}'\times\hat{z})+\gamma\bm{M}'\times\bm{B}'
+    \end{aligned}
+    \label{equ:Mdot}
+\end{equation}
+
+\subsection{RF场与有效场的计算}\label{chap:B_eff}
+考虑旋转RF场\footnote{勘误：原文p9(1.13)设置的总磁场为
+\begin{equation}
+    \bm{B}_\mathrm{tot}(t)=\begin{pmatrix} B_1\cos\omega_1t \\ B_1\sin\omega_1t \\ B_0 \end{pmatrix}
+\end{equation}
+即将RF场旋转方向设置为逆时针，与Larmor进动方向相反。此处与\autoref{footnote:dir}类似，将RF场设置为顺时针旋转，保证代数计算符合物理。}与静磁场合成的总磁场
+\begin{equation}
+    \bm{B}_\mathrm{tot}(t)=\bm{B}_\mathrm{RF}+\bm{B}_0=\begin{pmatrix} B_1\cos\omega_1t \\ -B_1\sin\omega_1t \\ B_0 \end{pmatrix} \label{equ:B_tot}
+\end{equation}
+变换到旋转系
+\begin{equation}
+    \bm{B}_\mathrm{tot}'=\mathbf{R}\bm{B}_\mathrm{tot}=\begin{pmatrix} B_1 \\ 0 \\ B_0 \end{pmatrix}
+\end{equation}
+将上式代入\autoref{equ:Mdot}可得
+\begin{equation}
+    \dot{\bm{M}}'=\gamma\bm{M}'\times\left(\bm{B}_\mathrm{tot}'-\frac{\omega_1}{\gamma}\hat{z}\right)
+    \label{equ:Mdotpri}
+\end{equation}
+结合Larmor频率\autoref{equ:larmor_freq}，定义有效场
+\begin{equation}
+    \bm{B}_\mathrm{eff}=\bm{B}_\mathrm{tot}'+\frac{\omega_1}{\gamma}\hat{z}=\begin{pmatrix} B_1 \\ 0 \\ B_0+\frac{\omega_1}{\gamma} \end{pmatrix}=\begin{pmatrix} B_1 \\ 0 \\ B_0\left(1-\frac{\omega_1}{\omega_0}\right) \end{pmatrix}
+\end{equation}
+因此，\autoref{equ:Mdotpri}可以改写为
+\begin{equation}
+    \boxed{\dot{\bm{M}}'(t)=\gamma\bm{M}'(t)\times\bm{B}_\mathrm{eff}}
+    \label{equ:bloch_stat}
+\end{equation}
+
+特别地，当发生共振时$\omega_1=\omega_0$，则$\bm{B}_\mathrm{eff}=(B_1,0,0)^T$，此时磁化矢量绕$x'$轴匀速旋转，定义翻转角
+\begin{equation}
+    \alpha=\int_{0}^{\tau}\omega_1(t)\,dt=\int_0^{\tau}\gamma B_1(t)\,dt
+\end{equation}
+若$B_1$恒定，$\alpha=\gamma B_1\tau$。
+
+\section{弛豫过程与Bloch方程}
+\autoref{equ:bloch_stat}所展示了Bloch方程动力学项的部分，接下来将讨论受激共振系统磁化矢量回到热平衡态所发生的弛豫过程。类比对磁化矢量的讨论，我们将弛豫过程分解为：1）纵向磁化矢量$M_z$恢复到热平衡态$M_0$的纵向弛豫（$T_1$）；2）横向磁化矢量$M_{zy}$向0衰减的横向弛豫（$T_2$）。
+
+\subsection{纵向弛豫（$T_1$）}
+$T_1$弛豫是一个一阶动力学ODE问题，纵向磁化矢量$M_z$恢复（即能量耗散）由特征常数$T_1$表征。其动力学方程为
+\begin{equation}
+    \dot{M}_z(t)=\gamma\left(\bm{M}(t)\times\bm{B}(t)\right)_z-\frac{M_z(t)-M_0}{T_1}
+    \label{equ:Mz_equ}
+\end{equation}
+在RF脉冲结束后，无横向射频场，故$\bm{M}\times\bm{B}_0$的$z$分量为零，因此解得
+\begin{equation}
+    M_z(t)=M_0+(M_z(0)-M_0)e^{-t/T_1}
+\end{equation}
+由于RF场的作用，在脉冲结束时刻$M_0$与$+\hat{z}$间夹角为翻转角$\alpha$，即$M_z(0)=M_0\cos\alpha$，则上式可写为
+\begin{equation}
+    \begin{aligned}
+        M_z(t)&=M_0+(M_0\cos\alpha-M_0)e^{-t/T_1}\\
+        &=M_0-M_0(1-\cos\alpha)e^{-t/T_1}
+    \end{aligned}
+\end{equation}
+
+\subsection{横向弛豫（$T_2$与$T_2^*$）}
+$T_2$弛豫同为一个一节动力学ODE问题，分离变量后的方程为
+\begin{align}
+    \dot{M}_x(t)&=\gamma\left(\bm{M}(t)\times\bm{B}(t)\right)_x-\frac{M_x(t)-M_0}{T_2}\\
+    \dot{M}_y(t)&=\gamma\left(\bm{M}(t)\times\bm{B}(t)\right)_y-\frac{M_y(t)-M_0}{T_2}
+\end{align}
+在求解过程中会产生耦合项。因此，考虑\autoref{chap:larmor_freq}中的方法：结合\autoref{equ:Mxy_def}对横向磁化矢量$M_{xy}$的定义及其在静磁场下的运动方程\autoref{equ:Mxy_equ}，可以写出弛豫方程
+\begin{equation}
+    \dot{M}_{xy}=-i\omega_0 M_{xy}-\frac{M_{xy}}{T_2}
+\end{equation}
+基于谐振解\autoref{equ:Mxy}，容易写出上式的解
+\begin{equation}
+    M_{xy}(t)=M_{xy}(0)e^{-i\omega_0 t}e^{-t/T_2}
+\end{equation}
+
+当存在静磁场不均匀性$\Delta B(\bm{r})$时，在一阶近似下总场为$B(\mathbf{r})=B_0+\Delta B(\mathbf{r})$\footnote{实际上，磁场不均匀性是一个矢量$\Delta\bm{B}(\bm{r})=(\Delta B_x,\Delta B_y,\Delta B_z)^T$，总场为
+\begin{equation}
+    \bm{B}(\bm{r})=B_0\hat{z}+\Delta\bm{B}(\bm{r})=
+    \begin{pmatrix} \Delta B_x \\ \Delta B_y \\ B_0+\Delta B_z \end{pmatrix}
+\end{equation}
+当$B_0\gg|\Delta\bm{B}|$时，在一阶近似下对总场模长泰勒展开
+\begin{equation}
+    |\bm{B}|=\sqrt{B_0^2+2B_0\Delta B_z+\Delta B_x^2+\Delta B_y^2+\Delta B_z^2}\approx B_0+\Delta B_z+O\left(\frac{\Delta B_\alpha^2}{B_0}\right)
+\end{equation}
+而Larmor频率$\omega$与总磁场的模长成正比
+\begin{equation}
+    \omega(\bm{r})=\gamma|\bm{B}(\bm{r})|\approx\gamma(B_0+\Delta B_z)=\omega_0+\gamma\Delta B_z
+\end{equation}
+即\autoref{equ:Mxy_inhom}中的指数指标。其中，为了简化，将$\Delta B_z$写为$\Delta B$.
+}。考虑磁场不均匀性的横向磁化矢量为
+\begin{equation}
+    M_{xy}(t,\bm{r})=M_{xy}(0,\bm{r})e^{-i\gamma B(\bm{r})t}e^{-t/T_2}=M_{xy}(0,\bm{r})e^{-i\omega_0t}e^{-i\gamma\Delta B(\bm{r})t}e^{-t/T_2}
+    \label{equ:Mxy_inhom}
+\end{equation}
+
+定义有效横向弛豫时间$T_2^*$\footnote{由于磁场矢量$\bm{B}$不出现在纵向弛豫方程\autoref{equ:Mz_equ}中，因此磁场不均匀性$\Delta B(\bm{r})$不影响纵向弛豫过程，故不存在“$T_1^*$”的概念。}
+\begin{equation}
+    \frac{1}{T_2^*}=\frac{1}{T_2}+\gamma\cdot\Delta B=\frac{1}{T_2}+\frac{1}{T_2'}
+\end{equation}
+实际上，$T_2$可以表征自旋系统间相互作用导致的相散，而$T_2^*$中额外项源于不均匀静磁场带来的相位累积。因此\autoref{equ:Mxy_inhom}可改写为
+\begin{equation}
+    M_{xy}(t,\bm{r})=M_{xy}(0,\bm{r})e^{-i\omega_0t}e^{-t/T_2^*}\quad\text{（对均匀样品）}
+\end{equation}
+
+至此，我们可以在稳态Bloch方程\autoref{equ:bloch_stat}的基础上写出考虑弛豫项的Bloch矢量方程
+\begin{equation}
+    \boxed{\dot{\bm{M}}(t)=\gamma(\bm{M}(t)\times\bm{B})-\begin{pmatrix} M_x(t)/T_2 \\ M_y(t)/T_2 \\ (M_z(t)-M_0)/T_1 \end{pmatrix}}
+\end{equation}
+
+\section{信号检测}
+\subsection{横向磁化矢量产生时变磁通量}
+设一个90$^\circ$RF脉冲沿$x'$轴施加\footnote{原文中p12将RF脉冲沿$y'$轴施加，而在本文中，为了与\autoref{chap:B_eff}中RF场的形式保持一致，我们选择沿$x'$轴的RF场。两种方向选择是完全等价的，仅在计算结果中相差$\pi/2$相位。}，脉冲结束时刻旋转系中$\bm{M}'=(0,M_0,0)$。变换回实验室系
+\begin{equation}
+    \bm{M}(t)=\mathbf{R}^T(t)\bm{M}'=
+    \begin{pmatrix}
+        \cos\omega_0t & -\sin\omega_0t & 0 \\
+        \sin\omega_0t & \cos\omega_0t & 0 \\
+        0 & 0 & 1
+    \end{pmatrix}
+    \begin{pmatrix} M_0 \\ 0 \\ 0 \end{pmatrix}
+    =\begin{pmatrix} -M_0\sin\omega_0t \\ M_0\cos\omega_0t \\ 0 \end{pmatrix}
+\end{equation}
+该过程的物理图像是：共振激发后，横向磁化矢量$M_{xy}$在实验室系以角频率$\omega_0$旋转，运动形式与\autoref{equ:Mxy}描述相同。
+
+时变横向磁化矢量产生时变磁通量$\phi(t)$。根据Faraday电磁感应定律，接收线圈中感生电动势
+\begin{equation}
+    \mathcal{E}\propto-\frac{d\phi}{dt}
+\end{equation}
+因$\phi(t)\propto M_{xy}(t)\propto e^{-i\omega_0t}e^{-t/T_2^*}$，则
+\begin{equation}
+    \mathcal{E}\propto -\left(-i\omega_0-\frac{1}{T_2^*}\right)\phi\propto e^{-i\omega_0t}e^{-t/T_2^*}\propto M_{xy}(t)
+\end{equation}
+为一个衰减震荡形式，即FID信号。
+
+宏观信号为FID信号的空间积分
+\begin{equation}
+    \boxed{S(t)\propto\int_{V} \mathcal{E}(\bm{r}) d\bm{r}\propto\int_{V} M_{xy}(t,\bm{r}) d\bm{r}=e^{-i\omega_0t}\int_{V} M_{xy}(0,\bm{r})e^{-t/T_2^*} d\bm{r}}
+\end{equation}
+
+\section{梯度编码与k-空间}
+\subsection{梯度场与梯度编码}
+在静磁场$\bm{B}_0=B_0\hat{z}$上叠加（与主磁场同向的）梯度场$\bm{B}'(\bm{r})=B'(\bm{r})\hat{z}$，总磁场为
+\begin{equation}
+    \bm{B}=\bm{B}_0+\bm{B}'(\bm{r})=\left[B_0+B'(\bm{r})\right]\hat{z}
+\end{equation}
+由此可见，总磁场矢量恒指向$\hat{z}$，可以简化为标量场（只考虑其$z$分量）
+\begin{equation}
+    B=B_0+B'
+\end{equation}
+定义磁场梯度$\bm{G}\equiv\nabla B=(G_x,G_y,G_z)^T$，则上式可写为
+\begin{equation}
+    B(\bm{r})=B_0+\bm{G}^T\bm{r}
+\end{equation}
+在此定义下，Larmor频率变为空间位置的函数
+\begin{equation}
+    \omega(\bm{r})=\gamma B(\bm{r})=\omega_0+\gamma\bm{G}^T\bm{r}
+\end{equation}
+
+考虑在梯度编码时间内（编码时间$t\ll T_2^*$），弛豫对横向磁化矢量的影响可以忽略，则横向磁化矢量在梯度存在时的演化
+\begin{equation}
+    M_{xy}(t,\bm{r}) = M_{xy}^0(\bm{r})e^{-i\gamma B(\bm{r})t}=M_{xy}^0(\bm{r})e^{-i\omega_0t}e^{-i\gamma\bm{G}^T\bm{r}t}
+\end{equation}
+接收信号为全空间内所有受激质子产生的FID信号之和
+\begin{equation}
+    S'(t)\propto e^{-i\omega_0t}\int_{V} M_{xy}^0(\bm{r})e^{-i\gamma \bm{G}^T\bm{r}t} d\bm{r}
+\end{equation}
+将接收信号与$\omega_0$参考信号混频进行正交解调，滤除$e^{-i\omega_0t}$载频，得到基带信号
+\begin{equation}
+    S(t)\propto\int_{V} M_{xy}^0(\bm{r})e^{-i\gamma\bm{G}^T\bm{r}t} d\bm{r}
+    \label{equ:S_org}
+\end{equation}
+此为空间频域的原始数据。
+
+\subsection{k-空间定义}
+定义波矢
+\begin{equation}
+    \bm{k}=(k_x,k_y,k_z)^T\equiv\begin{pmatrix} \gamma G_xt \\ \gamma G_yt \\ \gamma G_zt \end{pmatrix}
+\end{equation}
+代入\autoref{equ:S_org}可得
+\begin{equation}
+    \boxed{S(k_x,k_y,k_z)\propto\iiint M_{xy}^0(x,y,z)e^{-i(k_xx+k_yy+k_z z)} dxdydz}
+\end{equation}
+注意到，该形式恰好是初始磁化强度空间分布$M_{xy}^0(\bm{r})$的傅里叶变换
+\begin{equation}
+    \boxed{S(\bm{k})\propto\mathcal{F}\{M_{xy}^0(\bm{r})\}(\bm{k})}
+\end{equation}
+因此，通过逆傅里叶变换即可重建横向磁化强度的空间分布信息
+\begin{equation}
+    M_{xy}^0(\bm{r})\propto\mathcal{F}^{-1}\{S\}(\bm{r})
+\end{equation}
+
+\newpage
+\appendix
+\section{物理量符号及含义}
+\begin{table}[h]
+    \centering
+    \begin{tabularx}{\textwidth}{c X c}
+        \toprule
+        \textbf{符号} & \textbf{含义} & \textbf{单位} \\
+        \midrule
+        $s$ & 自旋量子数 & 无量纲 \\
+        $m_s$ & 自旋磁量子数 & 无量纲 \\
+        $\hbar$ & 约化普朗克常数 & $\si{J\cdot s}$ \\
+        $\gamma$ & 旋磁比 & $\si{rad\cdot s^{-1}\cdot T^{-1}}$ \\
+        $\hat{\bm{s}}$ & 自旋角动量算符 & $\si{J\cdot s}$ \\
+        $\hat{\bm{\mu}}$ & 磁矩算符 & $\si{J\cdot T^{-1}}$ \\
+        $\bm{B}_0$ & 主静磁场 & $\si{T}$ \\
+        $\omega_0$ & Larmor角频率 & $\si{rad\cdot s^{-1}}$ \\
+        $\Delta E$ & 塞曼能级间距 & $\si{J}$ \\
+        $k$ & 玻尔兹曼常数 & $\si{J\cdot K^{-1}}$ \\
+        $T$ & 绝对温度 & $\si{K}$ \\
+        $N^+$, $N^-$ & 高/低能态布居数 & 无量纲 \\
+        $N$ & 单位体积内核总数 & $\si{m^{-3}}$ \\
+        $M_0$ & 平衡态宏观磁化强度 & $\si{A\cdot m^{-1}}$ \\
+        $\bm{M}(t)$ & 宏观磁化强度矢量（实验室系） & $\si{A\cdot m^{-1}}$ \\
+        $\bm{M}'(t)$ & 宏观磁化强度矢量（旋转系） & $\si{A\cdot m^{-1}}$ \\
+        $M_{xy}$ & 横向磁化强度（复表示） & $\si{A\cdot m^{-1}}$ \\
+        $M_z$ & 纵向磁化强度 & $\si{A\cdot m^{-1}}$ \\
+        $\mathbf{R}(t)$ & 旋转坐标系变换矩阵 & 无量纲 \\
+        $\omega_1$ & 射频场旋转角频率 & $\si{rad\cdot s^{-1}}$ \\
+        $\bm{B}_{\mathrm{RF}}(t)$ & 射频磁场矢量（实验室系） & $\si{T}$ \\
+        $\bm{B}_{\mathrm{eff}}$ & 有效磁场矢量（旋转系） & $\si{T}$ \\
+        $B_1$ & 射频场振幅 & $\si{T}$ \\
+        $\alpha$ & 翻转角 & $\si{rad}$ \\
+        $\tau$ & 射频脉冲持续时间 & $\si{s}$ \\
+        $T_1$ & 纵向弛豫时间 & $\si{s}$ \\
+        $T_2$ & 横向弛豫时间 & $\si{s}$ \\
+        $T_2^*$ & 有效横向弛豫时间 & $\si{s}$ \\
+        $\Delta B(\bm{r})$ & 静磁场空间不均匀性（$z$ 分量） & $\si{T}$ \\
+        $\phi(t)$ & 磁通量 & $\si{Wb}$ \\
+        $\mathcal{E}$ & 感生电动势 & $\si{V}$ \\
+        $\bm{G}$ & 磁场梯度矢量 & $\si{T\cdot m^{-1}}$ \\
+        $\bm{k}$ & 波矢（$k$-空间坐标） & $\si{rad\cdot m^{-1}}$ \\
+        $S(t)$ & 时域基带信号 & 任意单位 \\
+        $S(\bm{k})$ & k-空间信号 & 任意单位 \\
+        $M_{xy}^0(\bm{r})$ & 初始横向磁化强度空间分布 & $\si{A\cdot m^{-1}}$ \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\printbibliography
+
+\end{document}
