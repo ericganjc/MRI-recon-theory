@@ -46,7 +46,7 @@
 
 \title{MR重建中的优化算法}
 \author{甘嘉程}
-\date{2026年7月}
+\date{2026年8-9月}
 
 \usepackage[a4paper,top=1.5cm,bottom=1.5cm,left=1.5cm,right=1.5cm]{geometry}
 \linespread{1.5}
@@ -61,36 +61,33 @@
 本章从优化理论的视角出发，系统阐述了MR图像重建中各类迭代算法的数学原理和收敛性质，涵盖光滑与非光滑目标函数、一阶加速方法、算子分裂技术以及原始-对偶框架，为理解现代MR重建算法的设计思想和实现细节提供了完整的数学基础。
 \end{abstract}
 
-\section{引言}
-如第一、二章所述，MRI中的数据采集在k空间中进行，k空间对应于图像的Fourier变换。当数据被全采样时，k空间数据的向量化形式$\bm{s}\in\mathbb{C}^p$与底层二维图像$\bm{x}\in\mathbb{C}^n$的向量化形式之间的关系可建模为
+\section{MR重建模型回顾与优化算法概述}
+首先来简要回顾第二章论述的MR重建问题的数学模型。MR数据采集在k空间中进行，其对应于图像的Fourier变换。当全采样时，k空间数据$\bm{s}\in\mathbb{C}^p$与图像数据$\bm{x}\in\mathbb{C}^n$间的正向模型
 \begin{equation}
-    \bm{s} = \mathbf{F}\bm{x},
+    \bm{s}=\mathbf{F}\bm{x}
     \label{equ:3.1}
 \end{equation}
-其中$\mathbf{F}$表示二维Fourier变换，其元素为$F_{\bm{k}\bm{r}} = \exp(-i2\pi\bm{k}_k^T\bm{r}_r)$，$\bm{k}_k\in\mathbb{R}^2$表示第$k$个k空间采样点的位置，$\bm{r}_r\in\mathbb{R}^2$表示第$r$个像素的空间坐标。当$\{\bm{k}_k\}$和$\{\bm{r}_r\}$均在笛卡尔网格上且$n=p$时，k空间测量值$\bm{s}$可通过二维快速Fourier变换（FFT）计算，图像$\bm{x}$可通过对二维逆FFT轻松重建。换言之，我们永远无需显式地存储或应用矩阵$\mathbf{F}$。这一结论同样适用于第四章中描述的非笛卡尔采样。
+其中$\mathbf{F}$表示二维Fourier变换矩阵，其元素$F_{\bm{k}\bm{r}}=\exp(-i2\pi\bm{k}_k^T\bm{r}_r)$，$\bm{k}_k\in\mathbb{R}^2$表示第$k$个k空间采样点的位置（$\bm{k}_k^T$为其转置），$\bm{r}_r\in\mathbb{R}^2$表示第$r$个像素的空间坐标。
 
-并行MRI使用一组线圈单元进行数据采集，每个线圈单元配有独立的接收器\cite{1,2}。每个线圈单元对其最近的磁化强度更为敏感，对较远处的磁化强度敏感度较低，这导致空间域中不同的线圈灵敏度分布。每个线圈记录的全采样k空间数据可表示为
+在并行成像中，引入线圈空间灵敏度编码矩阵$\mathbf{C}_c$，其是一个块对角矩阵，其对角线块为第$c$个线圈的空间灵敏度图。第$c$个线圈的全采样k空间数据为
 \begin{equation}
-    \bm{s}_c = \mathbf{F}\mathbf{C}_c\bm{x},
+    \bm{s}_c=\mathbf{F}\mathbf{C}_c\bm{x}
     \label{equ:3.2}
 \end{equation}
-其中$\mathbf{C}_c$是一个对角矩阵，其对角线元素为第$c$个线圈的空间灵敏度图。注意，尽管我们将$\mathbf{C}_c$表示为对角矩阵，但无需将线圈灵敏度图存储为对角矩阵。与体线圈（集成在扫描仪孔径中，距离被测对象较远）相比，使用靠近身体放置的线圈阵列进行数据采集可提供更好的信噪比（SNR）。并行成像指应用线圈阵列进行加速采集，其详细内容见并行成像章节。
 
-如第二章所述，在许多应用中，希望通过采集$p<n$个k空间测量值来加速MR数据采集\cite{3,4}。测量值通常使用$T\ge 1$个接收线圈并行采集\cite{1}，得到模型
+当欠采样时，$p<n$，设$T\ge 1$为接收线圈数量，则
 \begin{equation}
-    \bm{s}_c = \mathbf{B}\mathbf{F}\mathbf{C}_c\bm{x} + \bm{\epsilon}_c,
+    \bm{s}_c=\mathbf{B}\mathbf{F}\mathbf{C}_c\bm{x}+\bm{\epsilon}_c
     \label{equ:3.3a}
 \end{equation}
-其中$\mathbf{B}\in\mathbb{R}^{p\times n}$表示采样矩阵，包含$n\times n$单位矩阵的$p$行，$\bm{\epsilon}_c\in\mathbb{C}^p$为测量噪声。注意$\mathbf{B}\mathbf{F}$不依赖于线圈，因为所有线圈共享相同的k空间采样模式。通过将所有线圈的测量值拼接为向量$\bm{s}=(\bm{s}_1,\ldots,\bm{s}_T)$，我们得到常规的MRI正向模型
+其中$\mathbf{B}\in\mathbb{R}^{p\times n}$为采样矩阵，$\bm{\epsilon}_c\in\mathbb{C}^p$为线圈测量噪声。通过将所有线圈的测量值拼接为采样向量$\bm{s}=(\bm{s}_1,\ldots,\bm{s}_c,\ldots,\bm{s}_T)$，我们得到正向模型
 \begin{equation}
-    \boxed{\bm{s} = \mathbf{E}\bm{x} + \bm{\epsilon}},
+    \boxed{\bm{s}=\mathbf{E}\bm{x}+\bm{\epsilon}}
     \label{equ:3.3}
 \end{equation}
-其中$\mathbf{E}\in\mathbb{C}^{m\times n}$（$m=pT$）是表示物理信息的测量算子\footnote{测量算子$\mathbf{E}$：在图像重建过程中假定已知，其中采样矩阵$\mathbf{B}$由所采集的k空间样本$\{\bm{k}_k\}$的位置决定，灵敏度图$\{\mathbf{C}_c\}$通过专门的校准程序确定\cite{5,6}。注意我们不需要将$\mathbf{E}$作为显式矩阵；可将$\mathbf{E}$作为一个函数来应用，该函数依次计算线圈灵敏度图与图像的逐元素乘积、二维FFT和子采样。}，$\bm{\epsilon}\in\mathbb{C}^m$为测量噪声，通常假设为加性白Gaussian噪声。
+其中$\mathbf{E}\in\mathbb{C}^{T\times p\times n}$位编码矩阵\footnote{编码矩阵$\mathbf{E}$无需为显式矩阵，而是可以作为一个函数，依次计算线圈灵敏度与图像像素乘积、Fourier编码和子采样。}，$\bm{\epsilon}\in\mathbb{C}^m$为总测量噪声，通常假设为加性白Gaussian噪声。
 
-MRI中的数据使用一系列穿过k空间的测量轨迹采集。最常用的轨迹包括笛卡尔、放射状和螺旋状（见图3.1）。此外，在压缩感知的背景下，随机采样策略也已被探索\cite{3,4}。虽然非笛卡尔采样通常提供更高效的k空间覆盖并产生更少结构化伪影（有利于后续图像重建），但由于其简洁性，笛卡尔采样仍是临床实践中最广泛使用的选择。
-
-本章回顾了若干广泛用于MR图像重建的优化策略。讨论的自然起点是将MR图像重建表述为一个逆问题\footnote{逆问题与优化：在MR重建中，逆问题（由测量数据$\bm{s}$反推图像$\bm{x}$）的解通常通过优化一个目标函数来获得。该目标函数由数据保真项（量化与测量数据的一致性）和正则化项（编码先验知识）组成。根据所用函数的性质（光滑性、凸性等），自然地产生了不同的优化方法。}，其中采集的MRI数据$\bm{s}$被未知图像的先验知识所补充和补全。不同的优化方法自然地基于用于施加数据一致性和图像先验的函数性质而产生。此外，现代优化方法可在概念上分为纯基于模型的重建方法和可利用数据驱动先验的方法。贯穿本章，我们力求明确陈述所讨论迭代优化算法收敛性质的表征假设与结果。有兴趣进一步探索MRI优化算法的读者可参阅Fessler的最新综述\cite{7}，该综述为本文所呈现的材料提供了互补的视角。
+本章将讨论若干MR图像重建的优化策略。第二章论述了MR图像重建的数学基础是求解逆问题\footnote{在MR重建中，逆问题的解通常通过优化一个目标函数来获得，根据目标函数的性质（如光滑性、凸性等），产生了不同的优化方法。特别地，在正则化问题中，目标函数由数据保真项（量化与测量数据的一致性）和正则化项（编码先验知识）组成，这种情况是普遍存在的（见第二章）。}，其中采集的MR数据$\bm{s}$被图像先验知识所补全。不同的优化方法基于目标函数（即数据保真项和正则化项）的性质而产生。此外，现代优化方法分为基于模型的重建方法和利用数据驱动先验的方法。在本章中，将讨论不同迭代优化算法收敛性的假设与结果。
 
 \section{最小二乘重建}
 考虑从（\autoref{equ:3.3}中的）一组含噪测量值$\bm{s}\in\mathbb{C}^m$重建未知图像$\bm{x}\in\mathbb{C}^n$的问题。当矩阵$\mathbf{E}$良态且$m\ge n$时，最大似然（ML）估计器为重建$\bm{x}$提供了合理的方法。对于加性白Gaussian噪声（AWGN）模型，ML估计器退化为具有闭合解的最小二乘（LS）问题\footnote{最小二乘与最大似然：在AWGN假设下，ML估计等价于最小化$\|\bm{s}-\mathbf{E}\bm{x}\|_2^2$，参见第二章中关于MLE导出最小二乘的详细推导（\autoref{equ:2.13}-\autoref{equ:2.18}）。}
