@@ -56,7 +56,7 @@
 \maketitle
 
 \begin{abstract}
-本报告基于《Advances in Magnetic Resonance Technology and Applications》第三章内容，系统梳理了MR图像重建中的优化算法。报告从MR正向模型的基本形式出发，首先讨论了最小二乘（Least Squares）重建的闭合解与迭代求解方法，包括梯度下降法（Gradient Descent）和共轭梯度法（Conjugate Gradient）的详细推导、收敛条件以及算法伪代码。随后，报告将MR重建形式化为正则化优化问题$\hat{\bm{x}}=\arg\min_{\bm{x}}\{g(\bm{x})+h(\bm{x})\}$，并分别讨论了光滑优化方法（Tikhonov正则化、加速梯度法AGM及其$O(1/t^2)$收敛性）和非光滑优化方法（近端梯度法PGM/APGM/FISTA、交替方向乘子法ADMM、原始-对偶Chambolle-Pock算法）。报告详细推导了各类算法的迭代格式、近端算子的计算、收敛性定理，并通过算法伪代码加以说明。最后简要介绍了随机梯度方法（SGD、Adam、NADAM等）在MR重建中的应用前景。本报告的特点是在保持原文数学推导和算法完整性的基础上，将其翻译为中文并保持所有公式格式与原文一致。
+本报告基于《Advances in Magnetic Resonance Technology and Applications》第三章内容，系统梳理了MR图像重建中的优化算法。报告从MR正向模型的基本形式出发，首先讨论了最小二乘（Least Squares）重建的闭合解与迭代求解方法，包括梯度下降法（Gradient Descent）和共轭梯度法（Conjugate Gradient）的详细推导、收敛条件以及算法伪代码。随后，报告将MR重建形式化为正则化优化问题$\hat{\bm{x}}=\arg\min_{\bm{x}}\{g(\bm{x})+h(\bm{x})\}$，并分别讨论了光滑优化方法（Tikhonov正则化、加速梯度法AGM及其$O(1/t^2)$收敛性）和非光滑优化方法（近端梯度法PGM/APGM/FISTA、交替方向乘子法ADMM、原始-对偶Chambolle-Pock算法）。报告详细推导了各类算法的迭代格式、近端算子的计算、收敛性定理，并通过算法伪代码加以说明。最后简要介绍了随机梯度方法（Stochastic Gradient Descent、Adaptive Moment Estimation、Nesterov-Accelerated Adaptive Moment Estimation，缩写SGD、Adam、NADAM）等在MR重建中的应用前景。本报告的特点是在保持原文数学推导和算法完整性的基础上，将其翻译为中文并保持所有公式格式与原文一致。
 
 本章从优化理论的视角出发，系统阐述了MR图像重建中各类迭代算法的数学原理和收敛性质，涵盖光滑与非光滑目标函数、一阶加速方法、算子分裂技术以及原始-对偶框架，为理解现代MR重建算法的设计思想和实现细节提供了完整的数学基础。
 \end{abstract}
@@ -85,58 +85,89 @@
     \boxed{\bm{s}=\mathbf{E}\bm{x}+\bm{\epsilon}}
     \label{equ:3.3}
 \end{equation}
-其中$\mathbf{E}\in\mathbb{C}^{T\times p\times n}$位编码矩阵\footnote{编码矩阵$\mathbf{E}$无需为显式矩阵，而是可以作为一个函数，依次计算线圈灵敏度与图像像素乘积、Fourier编码和子采样。}，$\bm{\epsilon}\in\mathbb{C}^m$为总测量噪声，通常假设为加性白Gaussian噪声。
+其中$\mathbf{E}=\mathbf{B}\mathbf{F}\mathbf{C}_c\in\mathbb{C}^{T\times p\times n=m\times n}$位编码矩阵\footnote{编码矩阵$\mathbf{E}$无需为显式矩阵，而是可以作为一个函数，依次计算线圈灵敏度与图像像素乘积、Fourier编码和子采样。}，$\bm{\epsilon}\in\mathbb{C}^m$为总测量噪声，通常假设为加性白Gaussian噪声（Additive White Gaussian Noise，AWGN）\label{term:AWGN}。
 
 本章将讨论若干MR图像重建的优化策略。第二章论述了MR图像重建的数学基础是求解逆问题\footnote{在MR重建中，逆问题的解通常通过优化一个目标函数来获得，根据目标函数的性质（如光滑性、凸性等），产生了不同的优化方法。特别地，在正则化问题中，目标函数由数据保真项（量化与测量数据的一致性）和正则化项（编码先验知识）组成，这种情况是普遍存在的（见第二章）。}，其中采集的MR数据$\bm{s}$被图像先验知识所补全。不同的优化方法基于目标函数（即数据保真项和正则化项）的性质而产生。此外，现代优化方法分为基于模型的重建方法和利用数据驱动先验的方法。在本章中，将讨论不同迭代优化算法收敛性的假设与结果。
 
 \section{最小二乘重建}
-考虑从（\autoref{equ:3.3}中的）一组含噪测量值$\bm{s}\in\mathbb{C}^m$重建未知图像$\bm{x}\in\mathbb{C}^n$的问题。当矩阵$\mathbf{E}$良态且$m\ge n$时，最大似然（ML）估计器为重建$\bm{x}$提供了合理的方法。对于加性白Gaussian噪声（AWGN）模型，ML估计器退化为具有闭合解的最小二乘（LS）问题\footnote{最小二乘与最大似然：在AWGN假设下，ML估计等价于最小化$\|\bm{s}-\mathbf{E}\bm{x}\|_2^2$，参见第二章中关于MLE导出最小二乘的详细推导（\autoref{equ:2.13}-\autoref{equ:2.18}）。}
+考虑\autoref{equ:3.3}即从含噪测量值$\bm{s}\in\mathbb{C}^m$重建图像$\bm{x}\in\mathbb{C}^n$的逆问题。当$\mathbf{E}$为良态矩阵\footnote{良态矩阵（Well-conditioned Matrix）：条件数$\kappa(\mathbf{E})=\|\mathbf{E}\|\cdot\|\mathbf{E}^{\dagger}\|$较小的矩阵。良态矩阵的测量噪声或近似误差经求解过程放大有限；反之，病态矩阵（Ill-conditioned Matrix）会放大微扰对解的影响。在全采样（或过采样）条件下，良态条件保证$\mathbf{E}$列满秩，从而$\mathbf{E}^H\mathbf{E}$正定可逆，\autoref{equ:3.4}中的闭合解存在、唯一且数值稳定（满足三个Hadamard条件），确保可以使用MLE求解逆问题。}且$m\ge n$时，使用最大似然估计（Maximum Likelihood Estimation，MLE）\label{term:MLE}重建$\bm{x}$。对于AWGN模型，可由MLE推导\footnote{推导过程见第二章。}具有闭合解的最小二乘（Least Squares，LS）\label{term:LS}问题\footnote{勘误：原文p.61(3.4)出现$\frac{1}{2}$因子，与第二章(28)式系数不同。实际上，对图像的估计$\hat{\bm{x}}$取目标函数最小值点，而目标函数整体缩放不影响最小值点，故两式的解相同。而本章加入$\frac{1}{2}$因子后，目标函数的梯度为$\mathbf{E}^H(\mathbf{E}\bm{x}-\bm{s})$（推导过程见第二章），与梯度下降（\autoref{equ:3.6}）更新方向一致。而在GD迭代中，目标函数缩放因子的差异被步长$\gamma$吸收：本章收敛条件\autoref{equ:3.8}包含了缩放因子的倒数，若按第二章的写法则为$0<\gamma\le 1/\lambda_{\max}(\mathbf{E}^H\mathbf{E})$。}\footnote{勘误：最小二乘的目标函数$\frac{1}{2}\|\bm{s}-\mathbf{E}\bm{x}\|_2^2$为实值函数，本章所有梯度结果都应取实部。在本文中沿用了原文的表述，省略了取实部。}
 \begin{equation}
-    \hat{\bm{x}} = \arg\min_{\bm{x}} \frac{1}{2}\|\bm{s} - \mathbf{E}\bm{x}\|_2^2 = (\mathbf{E}^H\mathbf{E})^{-1}(\mathbf{E}^H\bm{s}),
+    \hat{\bm{x}}=\arg\min_{\bm{x}}f(\bm{x})=\arg\min_{\bm{x}}\frac{1}{2}\|\bm{s}-\mathbf{E}\bm{x}\|_2^2
     \label{equ:3.4}
 \end{equation}
-其中$(\cdot)^H$表示Hermitian转置\footnote{Hermitian转置：$\mathbf{A}^H\equiv(\mathbf{A}^T)^*$。对于复向量$\bm{a}$，$\|\bm{a}\|_2^2=\bm{a}^H\bm{a}=\sum|a_i|^2$。}。
+其中$f(\bm{x})=\frac{1}{2}\|\bm{s}-\mathbf{E}\bm{x}\|_2^2$称为LS问题的目标函数。
 
-尽管我们可以用闭合形式表示LS问题的解，但当问题维数很大时，计算该解在计算和存储复杂度方面可能面临挑战。注意我们可以使用向量的逐元素乘法和FFT将$\mathbf{E}$作为计算高效的算子来应用，但计算$\mathbf{E}^H\mathbf{E}=\sum_{c=1}^T \mathbf{C}_c^H\mathbf{F}^H\mathbf{B}^T\mathbf{B}\mathbf{F}\mathbf{C}_c$及其逆并不总是高效的。
-
-假设我们拥有来自所有接收线圈的全采样k空间数据（即$\mathbf{B}$是$n\times n$单位矩阵，且$m=Tn$）。在此情况下，我们可以简化$\mathbf{E}^H\mathbf{E}=\sum_{c=1}^T \mathbf{C}_c^H\mathbf{C}_c$，并将\autoref{equ:3.4}中的解写为
+接下来讨论\autoref{equ:3.4}的求解。由于
 \begin{equation}
-    \hat{\bm{x}} = \left(\sum_{c=1}^{T} \mathbf{C}_c^H\mathbf{C}_c\right)^{-1} \sum_{c=1}^{T} \mathbf{C}_c^H\mathbf{F}^H\bm{s}_c,
+    \mathbf{E}^H\mathbf{E}=\sum_{c=1}^T \mathbf{C}_c^H\mathbf{F}^H\mathbf{B}^T\mathbf{B}\mathbf{F}\mathbf{C}_c
+    \label{equ:3.5.0}
+\end{equation}
+当问题维数（即$\mathbf{E}$规模）很大时，\autoref{equ:3.5.0}的计算和储存具有较高复杂度。若所有采样线圈的数据均为k-空间全采样，即$\mathbf{B}\in\mathbb{R}^{n\times n}$且$m=Tn$，\autoref{equ:3.5.0}可简化为对角矩阵
+\begin{equation}
+    \mathbf{E}^H\mathbf{E}=\sum_{c=1}^T \mathbf{C}_c^H\mathbf{C}_c
+    \quad\Rightarrow\quad
+    \hat{\bm{x}}=(\mathbf{E}^H\mathbf{E})^{-1}(\mathbf{E}^H\bm{s})=\left(\sum_{c=1}^{T} \mathbf{C}_c^H\mathbf{C}_c\right)^{-1}\sum_{c=1}^{T} \mathbf{C}_c^H\mathbf{F}^H\bm{s}_c
     \label{equ:3.5}
 \end{equation}
-其中$\sum_{c=1}^{T}\mathbf{C}_c^H\mathbf{C}_c$是一个对角矩阵，其逆可通过对角元素的逐元素求逆计算\footnote{对角矩阵求逆：若$\mathbf{D}=\operatorname{diag}(d_1,d_2,\ldots,d_n)$且所有$d_i\neq 0$，则$\mathbf{D}^{-1}=\operatorname{diag}(1/d_1,1/d_2,\ldots,1/d_n)$。这使得全采样情况下的重建极为高效。}。
-
-在加速MRI的情况下，$\mathbf{B}$是一个$p<n$的子采样矩阵，我们无法简化$\mathbf{E}^H\mathbf{E}$或其逆的表达式。我们不是显式计算$\mathbf{E}$、$\mathbf{E}^H\mathbf{E}$或其逆，而是使用某种迭代方法（如梯度下降法或共轭梯度法\cite{8}）求解\autoref{equ:3.4}中的LS问题。
+此时$\hat{\bm{x}}$可以写出显式解需要满足$\mathbf{E}^H\mathbf{E}$可逆，而全采样（或过采样）满足了这一条件。若使用欠采样并行采集，即$\mathbf{B}\in\mathbb{R}^{p\times n}$且$p<n$，则无法显式写出$\mathbf{E}^H\mathbf{E}$及其逆，故也无法写出$\hat{\bm{x}}$的显式解，需用梯度下降法或共轭梯度法等迭代方法求解\autoref{equ:3.4}中的LS问题。接下来我们将逐一讨论。
 
 \subsection{梯度下降法}
+梯度下降（Gradient Descent，GD）\label{term:GD}法求解LS问题的基本原理是：在当前估计处计算目标函数的梯度，并以适当的步长沿梯度的负方向迭代更新估计。在这个过程中，GD通过迭代尝试找到满足收敛条件的最小的$\hat{\bm{x}}$，而负梯度的使用正是为了不断向下放缩$\bm{x}_i$。
 
-梯度下降（GD）法（也称最速下降法）是求解\autoref{equ:3.4}中最小二乘问题的最简迭代方法之一。GD法的基本原理是：在当前估计处迭代计算LS目标函数的梯度，并以适当的步长沿梯度的负方向更新估计。数学上，第$t$次迭代的GD更新可写为
+具体来说，对\autoref{equ:3.4}中的LS目标函数Taylor展开到一阶
 \begin{equation}
-    \bm{x}^t = \bm{x}^{t-1} - \gamma_t \mathbf{E}^H(\mathbf{E}\bm{x}^{t-1} - \bm{s}),
+    f(\bm{x}_{t-1}-\gamma\hat{\bm{e}})\approx f(\bm{x}_{t-1})-\gamma\hat{\bm{e}}^H\nabla f(\bm{x}_{t-1})
+\end{equation}
+其中$\hat{\bm{e}}$为单位向量。代入其梯度$\nabla f(\bm{x})=\mathbf{E}^H(\mathbf{E}\bm{x}-\bm{s})$\footnote{推导过程见第二章。}可得，在第$t$次GD迭代中，当前估计$\bm{x}_{t-1}$沿负梯度方向更新的估计
+\begin{equation}
+    \bm{x}_t=\bm{x}_{t-1}-\gamma_t\nabla f(\bm{x}_{t-1})=\bm{x}_{t-1}-\gamma_t\mathbf{E}^H(\mathbf{E}\bm{x}_{t-1}-\bm{s})
     \label{equ:3.6}
 \end{equation}
-其中$\gamma_t>0$表示步长\footnote{步长$\gamma_t$：可在每次迭代时调整或保持固定。GD的收敛速度取决于步长的选择和$\mathbf{E}^H\mathbf{E}$的特征值\cite{9,10}。步长过大可能导致发散，步长过小则收敛缓慢。}。
+其中$\gamma_t>0$为步长，可在每次迭代时调整或保持固定。GD的收敛性和收敛速度取决于步长选择，步长过大可能导致发散，步长过小则收敛缓慢。
 
-我们可以证明\autoref{equ:3.6}中的迭代更新收敛于\autoref{equ:3.4}中给出的LS估计。假设梯度下降以零向量$\bm{x}^0=\bm{0}$初始化，且对所有$t$有$\gamma_t=\gamma$，则可写为
+接下来讨论GD迭代解\autoref{equ:3.6}收敛于LS问题\autoref{equ:3.4}的解的条件。假设GD的初值为零向量$\bm{x}_0=\bm{0}$，且对所有$t$有$\gamma_t=\gamma$，则递归写出
 \begin{equation}
-    \bm{x}^t = (\mathbf{I} - \gamma\mathbf{E}^H\mathbf{E})\bm{x}^{t-1} + \gamma\mathbf{E}^H\bm{s} = \gamma\sum_{k=0}^{t-1}(\mathbf{I} - \gamma\mathbf{E}^H\mathbf{E})^k\mathbf{E}^H\bm{s}.
+    \bm{x}_t=(\mathbf{I}-\gamma\mathbf{E}^H\mathbf{E})\bm{x}_{t-1}+\gamma\mathbf{E}^H\bm{s}=\gamma\sum_{k=0}^{t-1}(\mathbf{I}-\gamma\mathbf{E}^H\mathbf{E})^k\mathbf{E}^H\bm{s}
     \label{equ:3.7}
 \end{equation}
-矩阵几何级数$\sum_{k=0}^{t-1}(\mathbf{I}-\gamma\mathbf{E}^H\mathbf{E})^k$收敛于$(\gamma\mathbf{E}^H\mathbf{E})^{-1}$，若谱范数$\|\mathbf{I}-\gamma\mathbf{E}^H\mathbf{E}\|<1$\cite{11}。该条件意味着，若
+由于当谱范数$\|\mathbf{I}-\gamma\mathbf{E}^H\mathbf{E}\|_2<1$时\footnote{谱范数（Spectral Norm）：矩阵$\mathbf{A}$的谱范数由向量$\ell_2$范数诱导，定义为
 \begin{equation}
-    \boxed{0 < \gamma \leq \frac{2}{\lambda_{\max}(\mathbf{E}^H\mathbf{E})}},
+    \|\mathbf{A}\|_2=\max_{\bm{x}\neq\bm{0}}\frac{\|\mathbf{A}\bm{x}\|_2}{\|\bm{x}\|_2}
+\end{equation}
+表示矩阵作用于向量后放大向量长度的最大倍数。$\mathbf{A}$的谱范数等于其最大奇异值
+\begin{equation}
+    \|\mathbf{A}\|_2=\sigma_{\max}(\mathbf{A})=\sqrt{\lambda_{\max}(\mathbf{A}^H\mathbf{A})}
+\end{equation}
+总的来说，向量范数衡量向量自身的长度（如$\ell_1$范数为分量绝对值之和，$\ell_2$范数为欧氏长度），而矩阵范数衡量矩阵对向量的拉伸能力。}，矩阵几何级数$\sum_k (\mathbf{I}-\gamma\mathbf{E}^H\mathbf{E})^k$收敛于$(\gamma\mathbf{E}^H\mathbf{E})^{-1}$，此时
+\begin{equation}
+    \lim_{t\to\infty}\bm{x}_t=\gamma(\gamma\mathbf{E}^H\mathbf{E})^{-1}\mathbf{E}^H\bm{s}=(\mathbf{E}^H\mathbf{E})^{-1}\mathbf{E}^H\bm{s}
+\end{equation}
+即GD收敛于\autoref{equ:3.4}的LS解。
+
+记Hermitian正定矩阵$\mathbf{E}^H\mathbf{E}$的特征值为$0<\lambda_1\le\ldots\le\lambda_n=\lambda_{\max}(\mathbf{E}^H\mathbf{E})$，则$\mathbf{I}-\gamma\mathbf{E}^H\mathbf{E}$的特征值为$1-\gamma\lambda_i$（$i=1,\ldots,n$）。对Hermitian矩阵\footnote{对Hermitian矩阵$\mathbf{A}$，谱范数等于特征值绝对值中的最大值，即$\|\mathbf{A}\|_2=\max|\lambda_i(\mathbf{A})|$。利用该性质可将范数条件转化为特征值条件$|1-\gamma\lambda_i|<1$。}，收敛条件
+\begin{equation}
+    \|\mathbf{I}-\gamma\mathbf{E}^H\mathbf{E}\|_2=\max\left|\lambda_i\left(\mathbf{I}-\gamma\mathbf{E}^H\mathbf{E}\right)\right|=\max\left|1-\gamma\lambda_i\right|<1
+\end{equation}
+要求所有特征值满足$|1-\gamma\lambda_i|<1$，则\footnote{勘误：p.62(3.8)对$\gamma$取值范围上界取等。事实上，当$\gamma=2/\lambda_{\max}$时，$1-\gamma\lambda_{\max}=-1$，谱范数恰为$1$，几何级数不收敛。因此，本文中$\gamma$取值范围为严格开区间。}
+\begin{equation}
+    0<\gamma\lambda_i<2
+    \quad\Rightarrow\quad
+    \gamma<\frac{2}{\lambda_i},\quad\forall i
+    \quad\Leftrightarrow\quad
+    \boxed{0<\gamma<\frac{2}{\lambda_{\max}(\mathbf{E}^H\mathbf{E})}}
     \label{equ:3.8}
 \end{equation}
-则梯度下降收敛于\autoref{equ:3.4}中的LS解，其中$\lambda_{\max}(\mathbf{E}^H\mathbf{E})$表示$\mathbf{E}^H\mathbf{E}$的最大特征值\footnote{特征值与收敛性：$\mathbf{E}^H\mathbf{E}$的条件数（最大特征值与最小非零特征值之比）决定了GD的收敛速度。条件数越大，收敛越慢。在加速MRI中，$\mathbf{E}^H\mathbf{E}$通常是高度病态的，因此单独使用GD可能收敛很慢。}。取决于$\mathbf{E}$的尺度和$\gamma$的选择，梯度下降可能不收敛或收敛非常缓慢。
+需要强调：1）受$\mathbf{E}$规模和$\gamma$的影响，GD法可能不收敛或收敛非常缓慢；2）上述讨论基于GD迭代解初值的选择，因此选定不同初值也可能影响GD法的收敛情况。
 
-\subsection{共轭梯度法（线性）}
+\subsection{线性共轭梯度法}
+共轭梯度（Conjugate Gradient，CG）\label{term:CG}法适用于对称正定矩阵，其核心思路是：在每次迭代中，沿一个与所有先前迭代更新方向共轭的方向更新估计。这种迭代思路确保CG法在求解具有$n$个方程的方程组时在最多$n$次迭代内收敛。
 
-共轭梯度（CG）法是求解线性方程组的一种流行方法，当系统矩阵对称正定时尤为适用\cite{12,8}。在每次迭代中，CG法沿一个与所有先前迭代中的更新方向共轭的方向更新估计。该性质确保CG法在求解具有$n$个方程的方程组时至多$n$次迭代内收敛。假设我们给定一个线性系统
+设算符$\mathcal{A}$由一个$n\times n$对称正定矩阵定义，给定线性系统
 \begin{equation}
-    \bm{y} = \mathcal{A}(\bm{x}),
+    \bm{y}=\mathcal{A}(\bm{x})
     \label{equ:3.9}
 \end{equation}
-其中$\mathcal{A}(\cdot)$是由一个$n\times n$对称正定矩阵定义的算子。我们使用算子记号以强调不需要显式的矩阵形式。CG法的完整步骤见算法1\footnote{算法1关键要点：（1）每次CG迭代需要一次系统算子$\mathcal{A}(\cdot)$的应用；（2）步长$\alpha_t$通过最小化残差$\|\bm{r}_t\|_2^2$在搜索方向$\bm{p}_t$上的二次型来解析计算，即$\alpha_t = \|\bm{r}_t\|_2^2 / \bm{p}_t^T\mathcal{A}(\bm{p}_t)$，这等价于在当前搜索方向上的一维精确线搜索；（3）$\beta_t$的选择（Fletcher-Reeves公式）确保新搜索方向$\bm{p}_{t+1}$与所有先前方向关于$\mathcal{A}$共轭，即$\bm{p}_i^T\mathcal{A}(\bm{p}_j)=0$（$i\neq j$）。}。注意，\autoref{equ:3.4}中给出的LS解可写为如下线性方程组
+CG法（详见算法1）的步骤是：（1）每次CG迭代需要一次系统算子$\mathcal{A}(\cdot)$的应用；（2）步长$\alpha_t$通过最小化残差$\|\bm{r}_t\|_2^2$在搜索方向$\bm{p}_t$上的二次型来解析计算，即$\alpha_t = \|\bm{r}_t\|_2^2 / \bm{p}_t^T\mathcal{A}(\bm{p}_t)$，这等价于在当前搜索方向上的一维精确线搜索；（3）$\beta_t$的选择（Fletcher-Reeves公式）确保新搜索方向$\bm{p}_{t+1}$与所有先前方向关于$\mathcal{A}$共轭，即$\bm{p}_i^T\mathcal{A}(\bm{p}_j)=0$（$i\neq j$）。注意，\autoref{equ:3.4}中给出的LS解可写为如下线性方程组
 \begin{equation}
     \underbrace{\mathbf{E}^H\bm{s}}_{\bm{y}} = \underbrace{\mathbf{E}^H\mathbf{E}\bm{x}}_{\mathcal{A}(\bm{x})},
     \label{equ:3.10}
@@ -148,26 +179,26 @@
     \caption{求解$\bm{y}=\mathcal{A}(\bm{x})$的共轭梯度法}
     \label{alg:cg1}
     \begin{algorithmic}[1]
-        \Require 初始估计$\bm{x}^0$和残差$\bm{r}^0 = \mathcal{A}(\bm{x}^0) - \bm{y}$
+        \Require 初值$\bm{x}_0$和残差$\bm{r}_0=\mathcal{A}(\bm{x}_0)-\bm{y}$
         \State $t \gets 0$
-        \State $\bm{p}^0 \gets \bm{r}^0$
+        \State $\bm{p}_0 \gets \bm{r}_0$
         \Repeat
-            \State $\alpha_t \gets \dfrac{\|\bm{r}^t\|_2^2}{\bm{p}_t^T\mathcal{A}(\bm{p}^t)}$
-            \State $\bm{x}^{t+1} \gets \bm{x}^t + \alpha_t \bm{p}^t$
-            \State $\bm{r}^{t+1} \gets \bm{r}^t - \alpha_t \mathcal{A}(\bm{p}^t)$
-            \If{$\|\bm{r}^t\|_2^2 \leq$ 阈值}
+            \State $\alpha_t \gets \dfrac{\|\bm{r}_t\|_2^2}{\bm{p}_t^T\mathcal{A}(\bm{p}_t)}$
+            \State $\bm{x}_{t+1} \gets \bm{x}_t + \alpha_t \bm{p}_t$
+            \State $\bm{r}_{t+1} \gets \bm{r}_t - \alpha_t \mathcal{A}(\bm{p}_t)$
+            \If{$\|\bm{r}_t\|_2^2 \leq$ 阈值}
                 \State \textbf{break}
             \EndIf
-            \State $\beta_t \gets \dfrac{\|\bm{r}^{t+1}\|_2^2}{\|\bm{r}^t\|_2^2}$
-            \State $\bm{p}^{t+1} \gets \bm{r}^{t+1} + \beta_t \bm{p}^t$
+            \State $\beta_t \gets \dfrac{\|\bm{r}_{t+1}\|_2^2}{\|\bm{r}_t\|_2^2}$
+            \State $\bm{p}_{t+1} \gets \bm{r}_{t+1} + \beta_t \bm{p}_t$
             \State $t \gets t+1$
         \Until{满足收敛/终止条件}
     \end{algorithmic}
 \end{algorithm}
 
-\subsection{共轭梯度法（非线性）}
+\subsection{非线性共轭梯度法}
 
-从目前的讨论来看，可以将CG视为二次函数$f(\bm{x})=\|\mathcal{A}(\bm{x})-\bm{y}\|^2$的极小化器。然而，CG可推广到极小化任何可计算梯度的连续函数$f(\bm{x})$。对于非线性CG法，我们遵循算法2。与线性版本的CG不同，多年来已发展出若干计算$\beta$的表达式用于非线性CG。四个著名的公式由Fletcher-Reeves（FR）\cite{13}、Polak-Ribière（PR）\cite{14}、Hestenes-Stiefel（HS）\cite{15}和Dai-Yuan（DY）\cite{16}给出：
+从目前的讨论来看，可以将CG视为二次函数$f(\bm{x})=\|\mathcal{A}(\bm{x})-\bm{y}\|^2$的极小化器。然而，CG可推广到极小化任何可计算梯度的连续函数$f(\bm{x})$。对于非线性CG法，我们遵循算法2。与线性版本的CG不同，多年来已发展出若干计算$\beta$的表达式用于非线性CG。四个著名的公式由Fletcher-Reeves（FR）、Polak-Ribière（PR）、Hestenes-Stiefel（HS）和Dai-Yuan（DY）给出：
 \begin{equation}
     \begin{aligned}
         \beta_{t+1}^{\mathrm{FR}} &= \frac{\bm{r}_{t+1}^T\bm{r}_{t+1}}{\bm{r}_t^T\bm{r}_t}, \quad
@@ -185,25 +216,25 @@
     \caption{极小化连续函数$f(\bm{x})$的共轭梯度法}
     \label{alg:cg2}
     \begin{algorithmic}[1]
-        \Require 初始值$\bm{x}^0$
+        \Require 初始值$\bm{x}_0$
         \State $t \gets 0$
-        \State $\bm{p}^0 \gets \bm{r}^0 \gets -\nabla f(\bm{x}^0)$
+        \State $\bm{p}_0 \gets \bm{r}_0 \gets -\nabla f(\bm{x}_0)$
         \Repeat
-            \State $\alpha_t \gets \arg\min_{\alpha_t} f(\bm{x}^t + \alpha_t \bm{p}^t)$ \Comment{通过线搜索}
-            \State $\bm{x}^{t+1} \gets \bm{x}^t + \alpha_t \bm{p}^t$
-            \State $\bm{r}^{t+1} \gets -\nabla f(\bm{x}^{t+1})$
-            \If{$\|\bm{r}^t\|_2^2 \leq$ 阈值}
+            \State $\alpha_t \gets \arg\min_{\alpha_t} f(\bm{x}_t + \alpha_t \bm{p}_t)$ \Comment{通过线搜索}
+            \State $\bm{x}_{t+1} \gets \bm{x}_t + \alpha_t \bm{p}_t$
+            \State $\bm{r}_{t+1} \gets -\nabla f(\bm{x}_{t+1})$
+            \If{$\|\bm{r}_t\|_2^2 \leq$ 阈值}
                 \State \textbf{break}
             \EndIf
             \State $\beta_{t+1} \gets \beta_{t+1}^{\text{formula}}$ \Comment{使用FR、PR、HS、DY等公式}
-            \State $\bm{p}^{t+1} \gets \bm{r}^{t+1} + \beta_{t+1}\bm{p}^t$
+            \State $\bm{p}_{t+1} \gets \bm{r}_{t+1} + \beta_{t+1}\bm{p}_t$
             \State $t \gets t+1$
         \Until{满足收敛/终止条件}
     \end{algorithmic}
 \end{algorithm}
 
 \section{基于模型的重建}
-当$m<n$时，由于逆问题的不适定性，最小二乘问题已知是次优的。我们可以将一般恢复问题表述为以下正则化优化问题\footnote{正则化优化问题与MAP估计：优化问题$\hat{\bm{x}}=\arg\min_{\bm{x}}\{g(\bm{x})+h(\bm{x})\}$可被识别为$\bm{x}$的最大后验概率（MAP）估计器，其中
+当$m<n$时，由于逆问题的不适定性，最小二乘问题已知是次优的。我们可以将一般恢复问题表述为以下正则化优化问题\footnote{正则化优化问题与MAP估计：优化问题$\hat{\bm{x}}=\arg\min_{\bm{x}}\{g(\bm{x})+h(\bm{x})\}$可被识别为$\bm{x}$的最大后验概率（Maximum a Posteriori，MAP）\label{term:MAP}估计器，其中
 \begin{equation}
     g(\bm{x}) = -\log p_{\bm{s}|\bm{x}}(\bm{s}|\bm{x}), \quad h(\bm{x}) = -\log p_{\bm{x}}(\bm{x}),
 \end{equation}
@@ -233,20 +264,20 @@ Tikhonov正则化是稳定不适定逆问题的最古老且最著名的技术之
 \end{equation}
 这可以使用算法1中的共轭梯度（CG）法计算\cite{19-21}。
 
-在更一般的设置中，正则化器$h$对应非二次可微函数。一个广泛用于极小化此类函数的算法是加速梯度法（AGM）\cite{22,11}，其迭代可写为
+在更一般的设置中，正则化器$h$对应非二次可微函数。一个广泛用于极小化此类函数的算法是加速梯度法（Accelerated Gradient Method，AGM）\label{term:AGM}\cite{22,11}，其迭代可写为
 \begin{align}
-    \bm{x}^t &= \bm{z}^{t-1} - \gamma_t \nabla f(\bm{z}^{t-1}), \label{equ:3.15a} \\
-    \bm{z}^t &= \bm{x}^t + \frac{q_{t-1}-1}{q_t}(\bm{x}^t - \bm{x}^{t-1}), \label{equ:3.15b}
+    \bm{x}_t &= \bm{z}_{t-1} - \gamma_t \nabla f(\bm{z}_{t-1}), \label{equ:3.15a} \\
+    \bm{z}_t &= \bm{x}_t + \frac{q_{t-1}-1}{q_t}(\bm{x}_t - \bm{x}_{t-1}), \label{equ:3.15b}
 \end{align}
-其中$t=1,2,3,\ldots$，$\bm{x}^0=\bm{z}^0\in\mathbb{C}^n$为初始化，$\gamma_t>0$为步长参数。注意，当对所有$t\ge 1$过度松弛参数$q_t=1$时，AGM退化为传统的梯度下降。然而，通过在每次迭代中自适应调整$\{q_t\}$，AGM寻求相对于GD加速收敛。$\{q_t\}$的一个广泛使用的选择是设置为
+其中$t=1,2,3,\ldots$，$\bm{x}_0=\bm{z}_0\in\mathbb{C}^n$为初始化，$\gamma_t>0$为步长参数。注意，当对所有$t\ge 1$过度松弛参数$q_t=1$时，AGM退化为传统的梯度下降。然而，通过在每次迭代中自适应调整$\{q_t\}$，AGM寻求相对于GD加速收敛。$\{q_t\}$的一个广泛使用的选择是设置为
 \begin{equation}
     q_t = \frac{1}{2}\left(1 + \sqrt{1 + 4q_{t-1}^2}\right) \quad \text{从} \quad q_0 = 1 \quad \text{开始}.
     \label{equ:3.16}
 \end{equation}
 
-AGM的步长参数通常固定在一个充分小的值$\gamma>0$，或通过回溯线搜索自适应调整\cite{9}。回溯线搜索寻求确保目标函数在每次迭代中有充分的下降\footnote{回溯线搜索的Armijo条件：给定梯度向量$\nabla f(\bm{z}^{t-1})$、初始步长$\gamma_t>0$以及参数$\theta\in(0,1/2]$和$\beta\in(0,1)$，回溯执行如下：
+AGM的步长参数通常固定在一个充分小的值$\gamma>0$，或通过回溯线搜索自适应调整\cite{9}。回溯线搜索寻求确保目标函数在每次迭代中有充分的下降\footnote{回溯线搜索的Armijo条件：给定梯度向量$\nabla f(\bm{z}_{t-1})$、初始步长$\gamma_t>0$以及参数$\theta\in(0,1/2]$和$\beta\in(0,1)$，回溯执行如下：
 \begin{quote}
-\textbf{当} $f(\bm{z}^{t-1} - \gamma_t\nabla f(\bm{z}^{t-1})) > f(\bm{z}^{t-1}) - \theta\gamma_t\|\nabla f(\bm{z}^{t-1})\|_2^2$ \textbf{执行} $\gamma_t \gets \beta\gamma_t$。
+\textbf{当} $f(\bm{z}_{t-1} - \gamma_t\nabla f(\bm{z}_{t-1})) > f(\bm{z}_{t-1}) - \theta\gamma_t\|\nabla f(\bm{z}_{t-1})\|_2^2$ \textbf{执行} $\gamma_t \gets \beta\gamma_t$。
 \end{quote}
 对于光滑函数$f$，该while循环保证在$\gamma_t$充分小的值时终止。}。
 
@@ -256,45 +287,45 @@ AGM的收敛速度可针对凸光滑函数进行精确刻画。考虑优化问�
 
 这是优化文献中广泛使用的假设，其简单断定了目标函数的凸性和光滑性。当$f$二次连续可微时，假设1等价于条件$\bm{0}\preceq\nabla^2 f(\bm{x})\preceq L\mathbf{I}$，其中$\nabla^2 f(\bm{x})\in\mathbb{R}^{n\times n}$是$f$的Hessian矩阵\footnote{Lipschitz连续梯度：$\|\nabla f(\bm{x})-\nabla f(\bm{y})\|_2\leq L\|\bm{x}-\bm{y}\|_2$对所有$\bm{x},\bm{y}$成立。$L$称为Lipschitz常数，它限制了梯度变化的剧烈程度。对于二次函数$f(\bm{x})=\frac{1}{2}\|\bm{s}-\mathbf{E}\bm{x}\|_2^2$，有$L=\lambda_{\max}(\mathbf{E}^H\mathbf{E})$。}。
 
-\textbf{假设2.} 函数$f$具有有限最小值$f^*=f(\bm{x}^*)$在某个$\bm{x}^*\in\mathbb{C}^n$处取得，使得$\|\bm{x}^0-\bm{x}^*\|_2\leq R$。
+\textbf{假设2.} 函数$f$具有有限最小值$f^*=f(\bm{x}^*)$在某个$\bm{x}^*\in\mathbb{C}^n$处取得，使得$\|\bm{x}_0-\bm{x}^*\|_2\leq R$。
 
-第二个假设简单地断言存在极小值点，其到初始化$\bm{x}^0$的距离有界。我们可以陈述以下著名的收敛结果\cite{11}：
+第二个假设简单地断言存在极小值点，其到初始化$\bm{x}_0$的距离有界。我们可以陈述以下著名的收敛结果\cite{11}：
 
 \textbf{定理1.} 在假设1-2下，使用固定步长$0<\gamma\leq 1/L$运行AGM $T\ge 1$次迭代。则该方法的迭代满足
 \begin{equation}
-    \boxed{f(\bm{x}^{t-1}) - f^* \leq \frac{2R^2}{\gamma(t+1)^2}}.
+    \boxed{f(\bm{x}_{t-1}) - f^* \leq \frac{2R^2}{\gamma(t+1)^2}}.
     \label{equ:3.17}
 \end{equation}
 
-如Nesterov\cite{11}所示，AGM在光滑凸优化中实现了一阶方法的最优$O(1/t^2)$收敛速度\footnote{最优一阶方法：Nesterov的里程碑式结果证明，对于光滑凸函数，任何仅使用梯度信息的一阶方法，其收敛速度不可能优于$O(1/t^2)$。AGM通过巧妙的"动量"外推（\autoref{equ:3.15b}）恰好达到此下界，而标准GD仅有$O(1/t)$的收敛速度。}。优化梯度法（OGM）\cite{23}是AGM的一种最新替代方案，具有类似的每次迭代复杂度，但相对于定理1的$2LR^2$，其常数因子$LR^2$更优，可使用步长参数$\gamma=1/L$实现。
+如Nesterov\cite{11}所示，AGM在光滑凸优化中实现了一阶方法的最优$O(1/t^2)$收敛速度\footnote{最优一阶方法：Nesterov的里程碑式结果证明，对于光滑凸函数，任何仅使用梯度信息的一阶方法，其收敛速度不可能优于$O(1/t^2)$。AGM通过巧妙的"动量"外推（\autoref{equ:3.15b}）恰好达到此下界，而标准GD仅有$O(1/t)$的收敛速度。}。优化梯度法（Optimized Gradient Method，OGM）\label{term:OGM}\cite{23}是AGM的一种最新替代方案，具有类似的每次迭代复杂度，但相对于定理1的$2LR^2$，其常数因子$LR^2$更优，可使用步长参数$\gamma=1/L$实现。
 
 \subsection{非光滑优化}
-MRI中许多广泛使用的正则化器$h(\cdot)$是非光滑的。一些著名的例子包括全变分（TV）\cite{24,6}、总广义变分（TGV）\cite{25,26}和Hessian Schatten-范数\cite{27,28}。例如，各向异性TV正则化的MRI重建可用以下项来表述
+MRI中许多广泛使用的正则化器$h(\cdot)$是非光滑的。一些著名的例子包括全变分（Total Variation，TV）\label{term:TV}\cite{24,6}、总广义变分（Total Generalized Variation，TGV）\label{term:TGV}\cite{25,26}和Hessian Schatten-范数\cite{27,28}。例如，各向异性TV正则化的MRI重建可用以下项来表述
 \begin{equation}
     g(\bm{x}) = \frac{1}{2}\|\bm{s} - \mathbf{E}\bm{x}\|_2^2 \quad \text{和} \quad h(\bm{x}) = \lambda\|\bm{\Phi}\bm{x}\|_1,
     \label{equ:3.18}
 \end{equation}
 其中$\lambda>0$为正则化参数，$\bm{\Phi}$表示沿图像$\bm{x}$的每个维度计算的有限差分。
 
-广泛使用的正则化器的不可微性导致了近端算法\cite{29}在图像重建中的广泛采用，这些算法无需对$h$求导。在此背景下，两个广泛使用的算法是近端梯度法（PGM）\cite{30-33}和交替方向乘子法（ADMM）\cite{34-36}。使非光滑正则化器的优雅处理成为可能的关键概念是近端算子\cite{37}\footnote{近端算子的直观理解：（1）$\operatorname{prox}_{\lambda h}(\bm{z})$寻求在"接近"$\bm{z}$（通过$\frac{1}{2}\|\bm{x}-\bm{z}\|_2^2$项）与"使$h(\bm{x})$小"（通过$\lambda h(\bm{x})$项）之间的平衡。（2）当$h(\cdot)=1_X(\cdot)$为集合$X$的示性函数时，近端算子退化为到$X$的投影。（3）近端算子也可解释为AWGN去噪问题$\bm{z}=\bm{x}+\bm{\eta}$（其中$\bm{\eta}\sim\mathcal{CN}(\bm{0},\lambda\mathbf{I})$，$\bm{x}\sim p_{\bm{x}}$）的MAP估计器，只需令$h(\bm{x})=-\log p_{\bm{x}}(\bm{x})$。}，定义为
+广泛使用的正则化器的不可微性导致了近端算法\cite{29}在图像重建中的广泛采用，这些算法无需对$h$求导。在此背景下，两个广泛使用的算法是近端梯度法（Proximal Gradient Method，PGM）\label{term:PGM}\cite{30-33}和交替方向乘子法（Alternating Direction Method of Multipliers，ADMM）\label{term:ADMM}\cite{34-36}。使非光滑正则化器的优雅处理成为可能的关键概念是近端算子\cite{37}\footnote{近端算子的直观理解：（1）$\operatorname{prox}_{\lambda h}(\bm{z})$寻求在"接近"$\bm{z}$（通过$\frac{1}{2}\|\bm{x}-\bm{z}\|_2^2$项）与"使$h(\bm{x})$小"（通过$\lambda h(\bm{x})$项）之间的平衡。（2）当$h(\cdot)=1_X(\cdot)$为集合$X$的示性函数时，近端算子退化为到$X$的投影。（3）近端算子也可解释为AWGN去噪问题$\bm{z}=\bm{x}+\bm{\eta}$（其中$\bm{\eta}\sim\mathcal{CN}(\bm{0},\lambda\mathbf{I})$，$\bm{x}\sim p_{\bm{x}}$）的MAP估计器，只需令$h(\bm{x})=-\log p_{\bm{x}}(\bm{x})$。}，定义为
 \begin{equation}
     \operatorname{prox}_{\lambda h}(\bm{z}) = \arg\min_{\bm{x}\in\mathbb{C}^n} \left\{\frac{1}{2}\|\bm{x} - \bm{z}\|_2^2 + \lambda h(\bm{x})\right\}, \quad \lambda > 0, \; \bm{z}\in\mathbb{C}^n.
     \label{equ:3.19}
 \end{equation}
 到子集$\mathcal{X}\subseteq\mathbb{C}^n$的投影是$h(\cdot)=1_{\mathcal{X}}(\cdot)$的近端算子，其中$1_{\mathcal{X}}(\cdot)$为示性函数\footnote{示性函数：$1_{\mathcal{X}}(\bm{x})=0$当$\bm{x}\in\mathcal{X}$，$1_{\mathcal{X}}(\bm{x})=+\infty$当$\bm{x}\notin\mathcal{X}$。此时近端算子退化为$\operatorname{prox}_{1_{\mathcal{X}}}(\bm{z})=\arg\min_{\bm{x}\in\mathcal{X}}\|\bm{x}-\bm{z}\|_2^2$，即到集合$\mathcal{X}$的欧氏投影。}，对任何$\bm{x}\in\mathcal{X}$取值为$0$，而对$\bm{x}\notin\mathcal{X}$取值为$+\infty$。尽管近端算子可为非凸函数定义，但当$h$为正常、闭合且凸时，其对每个$\bm{z}\in\mathbb{C}^n$的存在性和唯一性得以保证\cite{38}。
 
-算法3总结了PGM和加速PGM（APGM）\footnote{APGM与FISTA：加速PGM也称快速迭代收缩/阈值算法（FISTA）。当$q_t=1$对所有迭代成立时，算法对应传统PGM；当按\autoref{equ:3.16}更新$\{q_t\}$时，得到APGM/FISTA。APGM通过在PGM中简单地引入Nesterov加速而获得，其收敛速度从PGM的$O(1/t)$提升至$O(1/t^2)$。}（也称FISTA），其中后者通过在PGM中简单地引入Nesterov加速而获得。
+算法3总结了PGM和加速PGM（Accelerated Proximal Gradient Method，APGM）\label{term:APGM}\footnote{APGM与FISTA：加速PGM也称快速迭代收缩/阈值算法（Fast Iterative Shrinkage-Thresholding Algorithm，FISTA）\label{term:FISTA}。当$q_t=1$对所有迭代成立时，算法对应传统PGM；当按\autoref{equ:3.16}更新$\{q_t\}$时，得到APGM/FISTA。APGM通过在PGM中简单地引入Nesterov加速而获得，其收敛速度从PGM的$O(1/t)$提升至$O(1/t^2)$。}（也称FISTA），其中后者通过在PGM中简单地引入Nesterov加速而获得。
 
 \begin{algorithm}[ht]
     \small
     \caption{PGM/APGM}
     \label{alg:pgm}
     \begin{algorithmic}[1]
-        \Require 初始值$\bm{x}^0 = \bm{z}^0$和步长$\gamma > 0$
+        \Require 初始值$\bm{x}_0 = \bm{z}_0$和步长$\gamma > 0$
         \For{$t = 1, 2, \ldots$}
-            \State $\bm{u}^t \gets \bm{z}^{t-1} - \gamma \nabla g(\bm{z}^{t-1})$ \Comment{更多数据一致性}
-            \State $\bm{x}^t \gets \operatorname{prox}_{\gamma h}(\bm{u}^t)$ \Comment{更多正则化}
-            \State $\bm{z}^t \gets \bm{x}^t + \dfrac{q_{t-1}-1}{q_t}(\bm{x}^t - \bm{x}^{t-1})$
+            \State $\bm{u}_t \gets \bm{z}_{t-1} - \gamma \nabla g(\bm{z}_{t-1})$ \Comment{更多数据一致性}
+            \State $\bm{x}_t \gets \operatorname{prox}_{\gamma h}(\bm{u}_t)$ \Comment{更多正则化}
+            \State $\bm{z}_t \gets \bm{x}_t + \dfrac{q_{t-1}-1}{q_t}(\bm{x}_t - \bm{x}_{t-1})$
         \EndFor
     \end{algorithmic}
 \end{algorithm}
@@ -308,18 +339,18 @@ MRI中许多广泛使用的正则化器$h(\cdot)$是非光滑的。一些著名�
 \begin{equation}
     \mathcal{L}_\gamma(\bm{x},\bm{z},\bm{s}) = g(\bm{z}) + h(\bm{x}) + \bm{s}^T(\bm{x}-\bm{z}) + \frac{\gamma}{2}\|\bm{x}-\bm{z}\|_2^2,
 \end{equation}
-其中$\bm{s}$为对偶变量（Lagrange乘子），$\gamma>0$为惩罚参数。ADMM交替极小化$\mathcal{L}_\gamma$关于$\bm{z}$、$\bm{x}$，然后更新对偶变量$\bm{s}$。算法4中的变量$\bm{z}^t$实际上对应缩放后的对偶变量（$\bm{s}/\gamma$）。}与对偶变量$\bm{s}$，并以交替方式对$\bm{x}$、$\bm{z}$和$\bm{s}$进行优化来处理。可以考虑其他类似的变量分裂策略以获得ADMM的不同变体\cite{40}。
+其中$\bm{s}$为对偶变量（Lagrange乘子），$\gamma>0$为惩罚参数。ADMM交替极小化$\mathcal{L}_\gamma$关于$\bm{z}$、$\bm{x}$，然后更新对偶变量$\bm{s}$。算法4中的变量$\bm{z}_t$实际上对应缩放后的对偶变量（$\bm{s}/\gamma$）。}与对偶变量$\bm{s}$，并以交替方式对$\bm{x}$、$\bm{z}$和$\bm{s}$进行优化来处理。可以考虑其他类似的变量分裂策略以获得ADMM的不同变体\cite{40}。
 
 \begin{algorithm}[ht]
     \small
     \caption{ADMM}
     \label{alg:admm}
     \begin{algorithmic}[1]
-        \Require 初始值$\bm{x}^0$和惩罚参数$\gamma > 0$
+        \Require 初始值$\bm{x}_0$和惩罚参数$\gamma > 0$
         \For{$t = 1, 2, 3, \ldots$}
-            \State $\bm{u}^t \gets \operatorname{prox}_{\gamma g}(\bm{x}^{t-1} + \bm{z}^{t-1})$ \Comment{更多数据一致性}
-            \State $\bm{x}^t \gets \operatorname{prox}_{\gamma h}(\bm{u}^t - \bm{z}^{t-1})$ \Comment{更多正则化}
-            \State $\bm{z}^t \gets \bm{z}^{t-1} + \bm{x}^t - \bm{u}^t$
+            \State $\bm{u}_t \gets \operatorname{prox}_{\gamma g}(\bm{x}_{t-1} + \bm{z}_{t-1})$ \Comment{更多数据一致性}
+            \State $\bm{x}_t \gets \operatorname{prox}_{\gamma h}(\bm{u}_t - \bm{z}_{t-1})$ \Comment{更多正则化}
+            \State $\bm{z}_t \gets \bm{z}_{t-1} + \bm{x}_t - \bm{u}_t$
         \EndFor
     \end{algorithmic}
 \end{algorithm}
@@ -345,13 +376,13 @@ APGM在凸函数上的收敛行为与AGM相同。为明确陈述，我们假设�
 
 \textbf{假设4.} 函数$h$是正常、闭合且凸的。
 
-\textbf{假设5.} 函数$f=g+h$具有有限最小值$f^*=f(\bm{x}^*)$在某个$\bm{x}^*\in\mathbb{C}^n$处取得，使得$\|\bm{x}^0-\bm{x}^*\|_2\leq R$。
+\textbf{假设5.} 函数$f=g+h$具有有限最小值$f^*=f(\bm{x}^*)$在某个$\bm{x}^*\in\mathbb{C}^n$处取得，使得$\|\bm{x}_0-\bm{x}^*\|_2\leq R$。
 
 我们现在可以陈述以下优化中著名的结果（证明见\cite{33}）：
 
 \textbf{定理2.} 在假设3-5下，使用固定步长$0<\gamma\leq 1/L$运行APGM $T\ge 1$次迭代。则该方法的迭代满足
 \begin{equation}
-    \boxed{f(\bm{x}^t) - f^* \leq \frac{2R^2}{\gamma(t+1)^2}}.
+    \boxed{f(\bm{x}_t) - f^* \leq \frac{2R^2}{\gamma(t+1)^2}}.
     \label{equ:3.23}
 \end{equation}
 
@@ -369,11 +400,11 @@ ADMM的收敛性也在文献中得到了广泛研究\cite{34-36,40}。为陈述�
 \begin{itemize}
     \item \textbf{残差收敛：}迭代趋近可行性
     \begin{equation}
-        \lim_{t\to\infty} \|\bm{x}^t - \bm{z}^t\| = 0.
+        \lim_{t\to\infty} \|\bm{x}_t - \bm{z}_t\| = 0.
     \end{equation}
     \item \textbf{目标收敛：}迭代的目标值趋近最优值
     \begin{equation}
-        \lim_{t\to\infty} \left[g(\bm{z}^t) + h(\bm{x}^t)\right] = f^*.
+        \lim_{t\to\infty} \left[g(\bm{z}_t) + h(\bm{x}_t)\right] = f^*.
     \end{equation}
 \end{itemize}
 
@@ -386,7 +417,7 @@ ADMM的收敛性也在文献中得到了广泛研究\cite{34-36,40}。为陈述�
     \min_{\bm{x}} \; g(\mathbf{E}\bm{x}) + h(\bm{x}) \quad \text{（原始问题）},
     \label{equ:3.24}
 \end{equation}
-其中$g(\mathbf{E}\bm{x})$是数据保真项，$h(\bm{x})$是正则化项。Chambolle-Pock（CP）算法\cite{41}是一种一阶原始-对偶方法，求解以下鞍点问题\footnote{原始-对偶与凸共轭：$g^*(\bm{v})=\sup_{\bm{u}}\{\langle\bm{u},\bm{v}\rangle-g(\bm{u})\}$是$g$的凸共轭（或Fenchel-Legendre变换）。鞍点问题$\min_{\bm{x}}\max_{\bm{v}}\langle\mathbf{E}\bm{x},\bm{v}\rangle+h(\bm{x})-g^*(\bm{v})$与原始问题等价，因为$\max_{\bm{v}}\{\langle\mathbf{E}\bm{x},\bm{v}\rangle-g^*(\bm{v})\}=g(\mathbf{E}\bm{x})$。原始-对偶方法的关键动机在于：即使$g(\mathbf{E}\bm{x})$的近端算子难以计算（由于$\mathbf{E}$的存在），$g^*(\bm{v})$的近端算子通常具有闭合形式。}：
+其中$g(\mathbf{E}\bm{x})$是数据保真项，$h(\bm{x})$是正则化项。Chambolle-Pock（CP）\label{term:CP}算法\cite{41}是一种一阶原始-对偶方法，求解以下鞍点问题\footnote{原始-对偶与凸共轭：$g^*(\bm{v})=\sup_{\bm{u}}\{\langle\bm{u},\bm{v}\rangle-g(\bm{u})\}$是$g$的凸共轭（或Fenchel-Legendre变换）。鞍点问题$\min_{\bm{x}}\max_{\bm{v}}\langle\mathbf{E}\bm{x},\bm{v}\rangle+h(\bm{x})-g^*(\bm{v})$与原始问题等价，因为$\max_{\bm{v}}\{\langle\mathbf{E}\bm{x},\bm{v}\rangle-g^*(\bm{v})\}=g(\mathbf{E}\bm{x})$。原始-对偶方法的关键动机在于：即使$g(\mathbf{E}\bm{x})$的近端算子难以计算（由于$\mathbf{E}$的存在），$g^*(\bm{v})$的近端算子通常具有闭合形式。}：
 \begin{equation}
     \min_{\bm{x}} \max_{\bm{v}} \; \langle\mathbf{E}\bm{x}, \bm{v}\rangle + h(\bm{x}) - g^*(\bm{v}) \quad \text{（原始-对偶问题）},
     \label{equ:3.25}
@@ -400,20 +431,20 @@ $g(\mathbf{E}\bm{x})$可以是非光滑函数，如hinge损失\cite{49}、广义
     \caption{原始-对偶方法\cite{41,42}}
     \label{alg:pd}
     \begin{algorithmic}[1]
-        \Require 初始值$\bm{x}^0$、$\bar{\bm{x}}^0$、$\bm{v}^0$
+        \Require 初始值$\bm{x}_0$、$\bar{\bm{x}}_0$、$\bm{v}_0$
         \State $t \gets 0$
         \State 选择步长$\sigma > 0$和$\tau > 0$，使得$\sigma\tau L^2 < 1$，其中$L = \|\mathbf{E}\|$为诱导范数，以及$\theta\in[0,1]$
         \Repeat
-            \State $\bm{v}^{t+1} \gets \operatorname{prox}_{\sigma g^*}(\bm{v}^t + \sigma\mathbf{E}\bar{\bm{x}}^t)$ \Comment{对偶近端}
-            \State $\bm{x}^{t+1} \gets \operatorname{prox}_{\tau h}(\bm{x}^t - \tau\mathbf{E}^*\bm{v}^{t+1})$ \Comment{原始近端}
-            \State $\bar{\bm{x}}^{t+1} \gets \bm{x}^{t+1} + \theta(\bm{x}^{t+1} - \bm{x}^t)$ \Comment{外推}
+            \State $\bm{v}_{t+1} \gets \operatorname{prox}_{\sigma g^*}(\bm{v}_t + \sigma\mathbf{E}\bar{\bm{x}}_t)$ \Comment{对偶近端}
+            \State $\bm{x}_{t+1} \gets \operatorname{prox}_{\tau h}(\bm{x}_t - \tau\mathbf{E}^*\bm{v}_{t+1})$ \Comment{原始近端}
+            \State $\bar{\bm{x}}_{t+1} \gets \bm{x}_{t+1} + \theta(\bm{x}_{t+1} - \bm{x}_t)$ \Comment{外推}
             \State $t \gets t+1$
         \Until{满足收敛/终止条件}
     \end{algorithmic}
 \end{algorithm}
 
 \subsection{基于随机梯度的方法}
-随机梯度下降（SGD）方法的随机版本随着神经网络的兴起而变得流行。近年来，SGD方法在求解各种非凸优化问题方面取得了极大的成功。多年来，已提出GD和SGD方法的多种变体以确保更好的收敛性。这些方法包括Nesterov加速梯度（NAG）\cite{59}、Adagrad\cite{60}、RMSprop\cite{61}、Adadelta\cite{62}、自适应矩估计（ADAM）\cite{63}和Nesterov加速自适应矩估计（NADAM）\cite{64}。
+随机梯度下降（Stochastic Gradient Descent，SGD）\label{term:SGD}方法的随机版本随着神经网络的兴起而变得流行。近年来，SGD方法在求解各种非凸优化问题方面取得了极大的成功。多年来，已提出GD和SGD方法的多种变体以确保更好的收敛性。这些方法包括Nesterov加速梯度（Nesterov Accelerated Gradient，NAG）\label{term:NAG}\cite{59}、Adagrad\cite{60}、RMSprop\cite{61}、Adadelta\cite{62}、自适应矩估计（Adaptive Moment Estimation，ADAM）\label{term:ADAM}\cite{63}和Nesterov加速自适应矩估计（Nesterov-Accelerated Adaptive Moment Estimation，NADAM）\label{term:NADAM}\cite{64}。
 
 Nesterov加速梯度（NAG）将动量项纳入GD更新步骤。随着GD迭代接近局部极小值，更新通常逐渐变小，否则我们将从一个局部极小值附近跳到另一个。为确保这一点，引入了动量项。动量项对梯度指向相同方向的参数增加更新量，对梯度改变方向的参数减少更新量。Adagrad基于特征的出现频率自适应调整参数的学习率。Adagrad对不常出现的特征具有递减的学习率。RMSprop和Adadelta均被开发以解决Adagrad学习率递减的问题。Adam使用梯度的一阶矩和二阶矩进行GD更新。NADAM通过修改动量项将Adam和NAG相结合\footnote{SGD方法总结：（1）SGD —— 最基本的随机优化方法；（2）NAG —— 在SGD中加入Nesterov动量，使更新沿更平滑的轨迹行进；（3）Adagrad —— 自适应学习率，参数相关的学习率反比于历史梯度平方和的平方根；（4）RMSprop/Adadelta —— 用指数移动平均替代Adagrad中的累加求和，解决学习率单调递减问题；（5）Adam —— 结合动量（一阶矩估计）和自适应学习率（二阶矩估计），是目前最广泛使用的优化器之一；（6）NADAM —— 在Adam中融入Nesterov加速，将动量项替换为"向前看"的Nesterov形式。这些方法在基于深度学习的MR重建（如变分网络、深度展开网络）中被广泛应用。}。
 
@@ -444,7 +475,7 @@ Nesterov加速梯度（NAG）将动量项纳入GD更新步骤。随着GD迭代�
         $\bm{x}$ & 向量化待重建图像 & $\mathbb{C}^n$ \\
         $\hat{\bm{x}}$ & 重建图像估计 & $\mathbb{C}^n$ \\
         $\mathbf{F}$ & 二维Fourier变换矩阵 & $\mathbb{C}^{n\times n}$ \\
-        $\mathbf{B}$ & k空间采样矩阵（逻辑矩阵） & $\{0,1\}^{p\times n}$ \\
+        $\mathbf{B}$ & k空间采样矩阵 & $\{0,1\}^{p\times n}$ \\
         $\mathbf{C}_c$ & 第$c$个线圈的灵敏度对角矩阵 & $\mathbb{C}^{n\times n}$ \\
         $\mathbf{E}$ & 测量算子（正演模型矩阵） & $\mathbb{C}^{m\times n}$ \\
         $\bm{\epsilon}$ & 加性Gaussian噪声 & $\mathbb{C}^m$ \\
@@ -452,13 +483,13 @@ Nesterov加速梯度（NAG）将动量项纳入GD更新步骤。随着GD迭代�
         $n$ & 图像像素/体素总数 & $\mathbb{N}$ \\
         $p$ & 每线圈k空间采样点数 & $\mathbb{N}$ \\
         $T$ & 接收线圈总数 & $\mathbb{N}$ \\
-        $\mathbf{E}^H$ & $\mathbf{E}$的共轭转置（Hermitian转置） & --- \\
+        $\mathbf{E}^H$ & $\mathbf{E}$的Hermitian转置 & --- \\
         $\gamma_t$ & 第$t$次迭代的步长 & $\mathbb{R}_+$ \\
         $\lambda_{\max}(\cdot)$ & 矩阵的最大特征值 & --- \\
         $\mathbf{I}$ & 单位矩阵 & 无量纲 \\
         $\mathcal{A}(\cdot)$ & CG中的对称正定系统算子 & --- \\
-        $\bm{r}^t$ & 第$t$次迭代的残差向量 & $\mathbb{C}^n$ \\
-        $\bm{p}^t$ & 第$t$次迭代的搜索方向 & $\mathbb{C}^n$ \\
+        $\bm{r}_t$ & 第$t$次迭代的残差向量 & $\mathbb{C}^n$ \\
+        $\bm{p}_t$ & 第$t$次迭代的搜索方向 & $\mathbb{C}^n$ \\
         $\alpha_t$ & CG中的步长参数 & $\mathbb{R}$ \\
         $\beta_t$ & CG中的共轭方向参数 & $\mathbb{R}$ \\
         $g(\bm{x})$ & 数据保真项 & $\mathbb{R}$ \\
@@ -471,8 +502,8 @@ Nesterov加速梯度（NAG）将动量项纳入GD更新步骤。随着GD迭代�
         $L$ & Lipschitz常数 & $\mathbb{R}_+$ \\
         $q_t$ & Nesterov加速的过度松弛参数 & $\mathbb{R}$ \\
         $\operatorname{prox}_{\lambda h}(\cdot)$ & 函数$\lambda h$的近端算子 & --- \\
-        $\bm{z}^t$ & PGM/APGM/ADMM中的辅助变量 & $\mathbb{C}^n$ \\
-        $\bm{u}^t$ & 算法中的中间变量 & $\mathbb{C}^n$ \\
+        $\bm{z}_t$ & PGM/APGM/ADMM中的辅助变量 & $\mathbb{C}^n$ \\
+        $\bm{u}_t$ & 算法中的中间变量 & $\mathbb{C}^n$ \\
         $g^*(\cdot)$ & $g(\cdot)$的凸共轭（Fenchel-Legendre变换） & --- \\
         $\sigma, \tau$ & 原始-对偶算法中的步长参数 & $\mathbb{R}_+$ \\
         $L = \|\mathbf{E}\|$ & $\mathbf{E}$的诱导矩阵范数（谱范数） & --- \\
@@ -481,6 +512,39 @@ Nesterov加速梯度（NAG）将动量项纳入GD更新步骤。随着GD迭代�
         $f^*$ & $f$的全局最小值 & $\mathbb{R}$ \\
         $R$ & 初始点到最优解的距离上界 & $\mathbb{R}_+$ \\
         $1_{\mathcal{X}}(\cdot)$ & 集合$\mathcal{X}$的示性函数 & --- \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\newpage
+\section{术语中英文及缩写索引}
+下表按术语在正文中首次出现的先后顺序排列，页码为其首次出现位置。
+\begin{table}[h]
+    \small
+    \centering
+    \begin{tabularx}{\textwidth}{l X c r}
+        \toprule
+        \textbf{中文术语} & \textbf{英文全称} & \textbf{缩写} & \textbf{页码} \\
+        \midrule
+        加性白Gaussian噪声 & Additive White Gaussian Noise & AWGN & \pageref{term:AWGN} \\
+        最大似然估计 & Maximum Likelihood Estimation & MLE & \pageref{term:MLE} \\
+        最小二乘 & Least Squares & LS & \pageref{term:LS} \\
+        梯度下降 & Gradient Descent & GD & \pageref{term:GD} \\
+        共轭梯度 & Conjugate Gradient & CG & \pageref{term:CG} \\
+        最大后验概率 & Maximum a Posteriori & MAP & \pageref{term:MAP} \\
+        加速梯度法 & Accelerated Gradient Method & AGM & \pageref{term:AGM} \\
+        优化梯度法 & Optimized Gradient Method & OGM & \pageref{term:OGM} \\
+        全变分 & Total Variation & TV & \pageref{term:TV} \\
+        总广义变分 & Total Generalized Variation & TGV & \pageref{term:TGV} \\
+        近端梯度法 & Proximal Gradient Method & PGM & \pageref{term:PGM} \\
+        交替方向乘子法 & Alternating Direction Method of Multipliers & ADMM & \pageref{term:ADMM} \\
+        加速近端梯度法 & Accelerated Proximal Gradient Method & APGM & \pageref{term:APGM} \\
+        快速迭代收缩/阈值算法 & Fast Iterative Shrinkage-Thresholding Algorithm & FISTA & \pageref{term:FISTA} \\
+        Chambolle-Pock算法 & Chambolle-Pock & CP & \pageref{term:CP} \\
+        随机梯度下降 & Stochastic Gradient Descent & SGD & \pageref{term:SGD} \\
+        Nesterov加速梯度 & Nesterov Accelerated Gradient & NAG & \pageref{term:NAG} \\
+        自适应矩估计 & Adaptive Moment Estimation & ADAM & \pageref{term:ADAM} \\
+        Nesterov加速自适应矩估计 & Nesterov-Accelerated Adaptive Moment Estimation & NADAM & \pageref{term:NADAM} \\
         \bottomrule
     \end{tabularx}
 \end{table}
