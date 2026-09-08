@@ -19,10 +19,13 @@
 \usepackage{siunitx}
 \usepackage{mathtools}
 \usepackage{amssymb}
+\usepackage{amsthm}
+\newtheorem{theorem}{定理}
+\newtheorem{hypothesis}{假设}
 
-% 算法伪代码
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\newcommand{\algorithmautorefname}{Algorithm}
 \floatname{algorithm}{算法}
 \renewcommand{\algorithmicrequire}{\textbf{input:}}
 \renewcommand{\algorithmicensure}{\textbf{output:}}
@@ -36,6 +39,7 @@
 \renewcommand{\algorithmicend}{\textbf{end}}
 \renewcommand{\algorithmicwhile}{\textbf{while}}
 \renewcommand{\algorithmicloop}{\textbf{loop}}
+\algrenewcommand{\Require}{\State \algorithmicrequire}
 \algnewcommand{\algorithmicbreak}{\textbf{break}}
 \algnewcommand{\Break}{\State \algorithmicbreak}
 \algnewcommand{\algorithmicgoto}{\textbf{goto}}
@@ -87,7 +91,7 @@
 \end{equation}
 其中$\mathbf{E}=\mathbf{B}\mathbf{F}\mathbf{C}_c\in\mathbb{C}^{T\times p\times n=m\times n}$位编码矩阵\footnote{编码矩阵$\mathbf{E}$无需为显式矩阵，而是可以作为一个函数，依次计算线圈灵敏度与图像像素乘积、Fourier编码和子采样。}，$\bm{\epsilon}\in\mathbb{C}^m$为总测量噪声，通常假设为加性白Gaussian噪声（Additive White Gaussian Noise，AWGN）\label{term:AWGN}。
 
-本章将讨论若干MR图像重建的优化策略。第二章论述了MR图像重建的数学基础是求解逆问题\footnote{在MR重建中，逆问题的解通常通过优化一个目标函数来获得，根据目标函数的性质（如光滑性、凸性等），产生了不同的优化方法。特别地，在正则化问题中，目标函数由数据保真项（量化与测量数据的一致性）和正则化项（编码先验知识）组成，这种情况是普遍存在的（见第二章）。}，其中采集的MR数据$\bm{s}$被图像先验知识所补全。不同的优化方法基于目标函数（即数据保真项和正则化项）的性质而产生。此外，现代优化方法分为基于模型的重建方法和利用数据驱动先验的方法。在本章中，将讨论不同迭代优化算法收敛性的假设与结果。
+本章将讨论若干MR图像重建的优化策略。第二章论述了MR图像重建的数学基础是求解逆问题\footnote{在MR重建中，逆问题的解通常通过优化一个目标函数来获得，根据目标函数的性质（如光滑性、凸性等），产生了不同的优化方法。特别地，在正则化问题中，目标函数由数据保真项（量化与测量数据的一致性）和正则化项（编码先验知识）组成，这种情况是普遍存在的（见第二章）。}，其中采集的MR数据$\bm{s}$被图像先验知识所补全。不同的优化方法基于目标函数（即数据保真项和正则化项）的性质而产生。此外，现代优化方法分为基于模型的重建方法和利用数据驱动先验的方法。在本章中，将讨论不同迭代优化算法收敛性与收敛速度。
 
 \section{最小二乘重建}
 考虑\autoref{equ:3.3}即从含噪测量值$\bm{s}\in\mathbb{C}^m$重建图像$\bm{x}\in\mathbb{C}^n$的逆问题。当$\mathbf{E}$为良态矩阵\footnote{良态矩阵（Well-conditioned Matrix）：条件数$\kappa(\mathbf{E})=\|\mathbf{E}\|\cdot\|\mathbf{E}^{\dagger}\|$较小的矩阵。良态矩阵的测量噪声或近似误差经求解过程放大有限；反之，病态矩阵（Ill-conditioned Matrix）会放大微扰对解的影响。在全采样（或过采样）条件下，良态条件保证$\mathbf{E}$列满秩，从而$\mathbf{E}^H\mathbf{E}$正定可逆，\autoref{equ:3.4}中的闭合解存在、唯一且数值稳定（满足三个Hadamard条件），确保可以使用MLE求解逆问题。}且$m\ge n$时，使用最大似然估计（Maximum Likelihood Estimation，MLE）\label{term:MLE}重建$\bm{x}$。对于AWGN模型，可由MLE推导\footnote{推导过程见第二章。}具有闭合解的最小二乘（Least Squares，LS）\label{term:LS}问题\footnote{勘误：原文p.61(3.4)出现$\frac{1}{2}$因子，与第二章(28)式系数不同。实际上，对图像的估计$\hat{\bm{x}}$取目标函数最小值点，而目标函数整体缩放不影响最小值点，故两式的解相同。而本章加入$\frac{1}{2}$因子后，目标函数的梯度为$\mathbf{E}^H(\mathbf{E}\bm{x}-\bm{s})$（推导过程见第二章），与梯度下降（\autoref{equ:3.6}）更新方向一致。而在GD迭代中，目标函数缩放因子的差异被步长$\gamma$吸收：本章收敛条件\autoref{equ:3.8}包含了缩放因子的倒数，若按第二章的写法则为$0<\gamma\le 1/\lambda_{\max}(\mathbf{E}^H\mathbf{E})$。}\footnote{勘误：最小二乘的目标函数$\frac{1}{2}\|\bm{s}-\mathbf{E}\bm{x}\|_2^2$为实值函数，本章所有梯度结果都应取实部。在本文中沿用了原文的表述，省略了取实部。}
@@ -167,139 +171,152 @@
     \bm{y}=\mathcal{A}(\bm{x})
     \label{equ:3.9}
 \end{equation}
-CG法（详见算法1）的步骤是：（1）每次CG迭代需要一次系统算子$\mathcal{A}(\cdot)$的应用；（2）步长$\alpha_t$通过最小化残差$\|\bm{r}_t\|_2^2$在搜索方向$\bm{p}_t$上的二次型来解析计算，即$\alpha_t = \|\bm{r}_t\|_2^2 / \bm{p}_t^T\mathcal{A}(\bm{p}_t)$，这等价于在当前搜索方向上的一维精确线搜索；（3）$\beta_t$的选择（Fletcher-Reeves公式）确保新搜索方向$\bm{p}_{t+1}$与所有先前方向关于$\mathcal{A}$共轭，即$\bm{p}_i^T\mathcal{A}(\bm{p}_j)=0$（$i\neq j$）。注意，\autoref{equ:3.4}中给出的LS解可写为如下线性方程组
+如\autoref{equ:3.4}给出的正规方程
 \begin{equation}
-    \underbrace{\mathbf{E}^H\bm{s}}_{\bm{y}} = \underbrace{\mathbf{E}^H\mathbf{E}\bm{x}}_{\mathcal{A}(\bm{x})},
+    \underbrace{\mathbf{E}^H\bm{s}}_{\bm{y}}=\underbrace{\mathbf{E}^H\mathbf{E}\bm{x}}_{\mathcal{A}(\bm{x})}
     \label{equ:3.10}
 \end{equation}
-这可用算法1中的CG法求解。注意我们不需要计算或应用$\mathbf{E}^H\mathbf{E}$作为显式矩阵；我们可以使用一个涉及逐元素乘法和FFT的函数来计算矩阵乘法的效果。
+可用CG法求解。CG法（\autoref{alg:cg1}）的主要结构包括：1）应用一次算符$\mathcal{A}$迭代更新残差$\bm{r}_t$；2）步长$\alpha_t$通过最小化残差$\|\bm{r}_t\|_2^2$在搜索方向$\bm{p}_t$上的二次型来解析计算，即
+\begin{equation}
+    \alpha_t=\frac{\|\bm{r}_t\|_2^2}{\bm{p}_t^T\mathcal{A}(\bm{p}_t)}
+    \label{equ:3.11}
+\end{equation}
+这等价于在当前搜索方向上的一维线搜索\footnote{线搜索（Line Search）：在沿搜索方向$\bm{p}_t$确定步长$\alpha_t$的过程中，把多维极小化约化为直线$\{\bm{x}_t+\alpha\bm{p}_t:\alpha\in\mathbb{R}\}$上的一维优化
+\begin{equation}
+    \min_\alpha f(\bm{x}_t+\alpha\bm{p}_t)
+\end{equation}
 
+在线性CG中，线搜索有解析解。设目标函数$f(\bm{x})=\frac{1}{2}\bm{x}^T\mathcal{A}(\bm{x})-\bm{y}^T\bm{x}$（与$\|\mathcal{A}(\bm{x})-\bm{y}\|_2^2$极小点相同的等价二次型），令
+\begin{align}
+    \frac{\mathrm{d}}{\mathrm{d}\alpha}f(\bm{x}_t+\alpha\bm{p}_t)&=\bm{p}_t^T\left[\mathcal{A}(\bm{x}_t)-\bm{y}\right]+\alpha\bm{p}_t^T\mathcal{A}(\bm{p}_t)=0 \\
+    \Rightarrow\quad\alpha_t&=\frac{\bm{p}_t^T(\bm{y}-\mathcal{A}(\bm{x}_t))}{\bm{p}_t^T\mathcal{A}(\bm{p}_t)}
+\end{align}
+约定残差$\bm{r}_t=\bm{y}-\mathcal{A}(\bm{x}_t)$并利用正交性$\bm{p}_t^T\bm{r}_t=\|\bm{r}_t\|_2^2$，可得步长公式\autoref{equ:3.11}。而在非线性CG中，线搜索一般无解析解，需使用迭代线搜索方法。}；3）$\beta_t$确保新搜索方向$\bm{p}_{t+1}$与所有先前方向关于$\mathcal{A}$共轭，即$\bm{p}_i^T\mathcal{A}(\bm{p}_j)=0$（$i\neq j$）。
 \begin{algorithm}[ht]
     \small
-    \caption{求解$\bm{y}=\mathcal{A}(\bm{x})$的共轭梯度法}
+    \caption{求解$\bm{y}=\mathcal{A}(\bm{x})$的线性共轭梯度法}
     \label{alg:cg1}
     \begin{algorithmic}[1]
         \Require 初值$\bm{x}_0$和残差$\bm{r}_0=\mathcal{A}(\bm{x}_0)-\bm{y}$
-        \State $t \gets 0$
-        \State $\bm{p}_0 \gets \bm{r}_0$
+        \State $t\gets0$
+        \State $\bm{p}_0\gets\bm{r}_0$
         \Repeat
-            \State $\alpha_t \gets \dfrac{\|\bm{r}_t\|_2^2}{\bm{p}_t^T\mathcal{A}(\bm{p}_t)}$
-            \State $\bm{x}_{t+1} \gets \bm{x}_t + \alpha_t \bm{p}_t$
-            \State $\bm{r}_{t+1} \gets \bm{r}_t - \alpha_t \mathcal{A}(\bm{p}_t)$
-            \If{$\|\bm{r}_t\|_2^2 \leq$ 阈值}
+            \State $\alpha_t\gets\dfrac{\|\bm{r}_t\|_2^2}{\bm{p}_t^T\mathcal{A}(\bm{p}_t)}$ \Comment{线搜索}
+            \State $\bm{x}_{t+1}\gets\bm{x}_t+\alpha_t\bm{p}_t$
+            \State $\bm{r}_{t+1}\gets\bm{r}_t-\alpha_t\mathcal{A}(\bm{p}_t)$ \Comment{更新残差}
+            \If{$\|\bm{r}_t\|_2^2\leq$阈值}
                 \State \textbf{break}
             \EndIf
-            \State $\beta_t \gets \dfrac{\|\bm{r}_{t+1}\|_2^2}{\|\bm{r}_t\|_2^2}$
-            \State $\bm{p}_{t+1} \gets \bm{r}_{t+1} + \beta_t \bm{p}_t$
-            \State $t \gets t+1$
+            \State $\beta_t\gets\dfrac{\|\bm{r}_{t+1}\|_2^2}{\|\bm{r}_t\|_2^2}$ \Comment{共轭搜索系数}
+            \State $\bm{p}_{t+1}\gets\bm{r}_{t+1}+\beta_t\bm{p}_t$
+            \State $t\gets t+1$
         \Until{满足收敛/终止条件}
     \end{algorithmic}
 \end{algorithm}
 
 \subsection{非线性共轭梯度法}
+线性CG法可以视作极小化二次函数$f(\bm{x})=\|\mathcal{A}(\bm{x})-\bm{y}\|_2^2$，而非线性CG法可以极小化任何可计算梯度的连续函数$f(\bm{x})$。在非线性CG法中，$\beta$的计算公式由Fletcher-Reeves（FR）、Polak-Ribière（PR）、Hestenes-Stiefel（HS）和Dai-Yuan（DY）给出
+\begin{align}
+    \beta_{t+1}^{\mathrm{FR}}&=\frac{\bm{r}_{t+1}^T\bm{r}_{t+1}}{\bm{r}_t^T\bm{r}_t} \\
+    \beta_{t+1}^{\mathrm{PR}}&=\frac{\bm{r}_{t+1}^T(\bm{r}_{t+1}-\bm{r}_t)}{\bm{r}_t^T\bm{r}_t} \\
+    \beta_{t+1}^{\mathrm{HS}}&=\frac{\bm{r}_{t+1}^T(\bm{r}_{t+1}-\bm{r}_t)}{-\bm{p}_t^T(\bm{r}_{t+1}-\bm{r}_t)} \\
+    \beta_{t+1}^{\mathrm{DY}}&=\frac{\bm{r}_{t+1}^T\bm{r}_{t+1}}{-\bm{p}_t^T(\bm{r}_{t+1}-\bm{r}_t)}
+\end{align}
 
-从目前的讨论来看，可以将CG视为二次函数$f(\bm{x})=\|\mathcal{A}(\bm{x})-\bm{y}\|^2$的极小化器。然而，CG可推广到极小化任何可计算梯度的连续函数$f(\bm{x})$。对于非线性CG法，我们遵循算法2。与线性版本的CG不同，多年来已发展出若干计算$\beta$的表达式用于非线性CG。四个著名的公式由Fletcher-Reeves（FR）、Polak-Ribière（PR）、Hestenes-Stiefel（HS）和Dai-Yuan（DY）给出：
-\begin{equation}
-    \begin{aligned}
-        \beta_{t+1}^{\mathrm{FR}} &= \frac{\bm{r}_{t+1}^T\bm{r}_{t+1}}{\bm{r}_t^T\bm{r}_t}, \quad
-        \beta_{t+1}^{\mathrm{PR}} = \frac{\bm{r}_{t+1}^T(\bm{r}_{t+1}-\bm{r}_t)}{\bm{r}_t^T\bm{r}_t}, \\
-        \beta_{t+1}^{\mathrm{HS}} &= \frac{\bm{r}_{t+1}^T(\bm{r}_{t+1}-\bm{r}_t)}{-\bm{p}_t^T(\bm{r}_{t+1}-\bm{r}_t)}, \quad
-        \beta_{t+1}^{\mathrm{DY}} = \frac{\bm{r}_{t+1}^T\bm{r}_{t+1}}{-\bm{p}_t^T(\bm{r}_{t+1}-\bm{r}_t)}.
-    \end{aligned}
-    \label{equ:3.11}
-\end{equation}
-
-由于一般函数$f$可能具有许多局部极小值，无法保证CG收敛到全局极小值。线搜索\footnote{线搜索（Line Search）：在CG中用于寻找$\alpha_t$，该操作需要求零点。两种著名的迭代线搜索方法是Newton-Raphson法和割线法。两种方法都需要$f$关于$\alpha$的Hessian矩阵的存在性。然而，Newton-Raphson法使用二阶导数，而割线法使用一阶导数近似二阶导数。虽然Newton-Raphson法收敛快得多，但计算代价高昂。}可用于在CG中寻找$\alpha_t$。
-
+非线性CG法的伪代码见\autoref{alg:cg2}。需要指出，一般函数$f$可能具有许多局部极小值，无法保证CG收敛到全局极小值。
 \begin{algorithm}[ht]
     \small
-    \caption{极小化连续函数$f(\bm{x})$的共轭梯度法}
+    \caption{极小化连续函数$f(\bm{x})$的非线性共轭梯度法}
     \label{alg:cg2}
     \begin{algorithmic}[1]
         \Require 初始值$\bm{x}_0$
-        \State $t \gets 0$
-        \State $\bm{p}_0 \gets \bm{r}_0 \gets -\nabla f(\bm{x}_0)$
+        \State $t\gets0$
+        \State $\bm{p}_0\gets\bm{r}_0\gets-\nabla f(\bm{x}_0)$
         \Repeat
-            \State $\alpha_t \gets \arg\min_{\alpha_t} f(\bm{x}_t + \alpha_t \bm{p}_t)$ \Comment{通过线搜索}
-            \State $\bm{x}_{t+1} \gets \bm{x}_t + \alpha_t \bm{p}_t$
-            \State $\bm{r}_{t+1} \gets -\nabla f(\bm{x}_{t+1})$
-            \If{$\|\bm{r}_t\|_2^2 \leq$ 阈值}
+            \State $\alpha_t\gets\arg\min_{\alpha_t} f(\bm{x}_t+\alpha_t\bm{p}_t)$ \Comment{线搜索}
+            \State $\bm{x}_{t+1}\gets\bm{x}_t+\alpha_t\bm{p}_t$
+            \State $\bm{r}_{t+1}\gets-\nabla f(\bm{x}_{t+1})$ \Comment{更新参差}
+            \If{$\|\bm{r}_t\|_2^2\leq$阈值}
                 \State \textbf{break}
             \EndIf
-            \State $\beta_{t+1} \gets \beta_{t+1}^{\text{formula}}$ \Comment{使用FR、PR、HS、DY等公式}
-            \State $\bm{p}_{t+1} \gets \bm{r}_{t+1} + \beta_{t+1}\bm{p}_t$
-            \State $t \gets t+1$
+            \State $\beta_{t+1}\gets\beta_{t+1}$ \Comment{使用FR、PR、HS、DY等公式，确定共轭搜索系数}
+            \State $\bm{p}_{t+1}\gets\bm{r}_{t+1}+\beta_{t+1}\bm{p}_t$
+            \State $t\gets t+1$
         \Until{满足收敛/终止条件}
     \end{algorithmic}
 \end{algorithm}
 
 \section{基于模型的重建}
-当$m<n$时，由于逆问题的不适定性，最小二乘问题已知是次优的。我们可以将一般恢复问题表述为以下正则化优化问题\footnote{正则化优化问题与MAP估计：优化问题$\hat{\bm{x}}=\arg\min_{\bm{x}}\{g(\bm{x})+h(\bm{x})\}$可被识别为$\bm{x}$的最大后验概率（Maximum a Posteriori，MAP）\label{term:MAP}估计器，其中
+当欠采样（即$m<n$）时，将欠定逆问题表述为正则化问题
 \begin{equation}
-    g(\bm{x}) = -\log p_{\bm{s}|\bm{x}}(\bm{s}|\bm{x}), \quad h(\bm{x}) = -\log p_{\bm{x}}(\bm{x}),
-\end{equation}
-$p_{\bm{s}|\bm{x}}$为似然，$p_{\bm{x}}$为图像先验。自然地，\autoref{equ:3.4}中的LS是具有均匀图像先验的AWGN下MAP的特例。}：
-\begin{equation}
-    \hat{\bm{x}} = \arg\min_{\bm{x}} f(\bm{x}) \quad \text{其中} \quad f(\bm{x}) = g(\bm{x}) + h(\bm{x}),
+    \hat{\bm{x}}=\arg\min_{\bm{x}}f(\bm{x})=\arg\min_{\bm{x}}\left\{g(\bm{x})+h(\bm{x})\right\}
     \label{equ:3.12}
 \end{equation}
-其中$g$是量化与观测数据$\bm{s}$一致性的数据保真项，$h$是编码先验知识的正则化器。
+其中$g$是数据保真项，$h$是编码先验知识的正则化项。本节讨论正则化问题\autoref{equ:3.12}的求解优化方法。\autoref{chap:3.1}讨论可微目标函数$f$的光滑优化方法，\autoref{chap:3.2}考虑适用于不可微正则化项的非光滑优化方法。
 
-在本节中，我们讨论求解形式为（\autoref{equ:3.12}）的问题的优化方法。我们首先讨论适用于可微函数$f$的传统光滑优化方法。然后考虑适用于正则化器不可微的问题的非光滑优化方法。
-
-\subsection{光滑优化}
-Tikhonov正则化是稳定不适定逆问题的最古老且最著名的技术之一\cite{17,18}。在其经典形式中，它寻求极小化LS数据保真项与二次正则化器之和
+\subsection{光滑优化}\label{chap:3.1}
+光滑优化的一种方法是基于Tikhonov正则化（$\ell_2$范数正则化）。第二章指出，任意线性矩阵$\mathbf{L}$均可放入Tikhonov正则化项，即
 \begin{equation}
-    g(\bm{x}) = \frac{1}{2}\|\bm{s} - \mathbf{E}\bm{x}\|_2^2 \quad \text{和} \quad h(\bm{x}) = \frac{\lambda}{2}\|\bm{\Phi}\bm{x}\|_2^2,
-    \label{equ:3.13}
+    \hat{\bm{x}}=\arg\min_{\bm{x}}\left\{\|\bm{s}-\mathbf{E}\bm{x}\|_2^2+\lambda\|\mathbf{L}\bm{x}-\bm{x}^0\|_2^2\right\}
 \end{equation}
-其中$\lambda>0$表示正则化参数，$\bm{\Phi}$表示稀疏变换。Tikhonov解退化为以下闭合形式表达式\footnote{Tikhonov闭合解的推导：对$f(\bm{x})=\frac{1}{2}\|\bm{s}-\mathbf{E}\bm{x}\|_2^2+\frac{\lambda}{2}\|\bm{\Phi}\bm{x}\|_2^2$求梯度并令其为零：
+可以得到$\bm{x}$的显式解析解
 \begin{equation}
-    \nabla f(\bm{x}) = \mathbf{E}^H(\mathbf{E}\bm{x}-\bm{s}) + \lambda\bm{\Phi}^H\bm{\Phi}\bm{x} = \bm{0} \;\Longrightarrow\; (\mathbf{E}^H\mathbf{E}+\lambda\bm{\Phi}^H\bm{\Phi})\hat{\bm{x}} = \mathbf{E}^H\bm{s},
+    \hat{\bm{x}}=\left(\mathrm{Re}\left[\mathbf{E}^H\mathbf{E}\right]+\lambda\mathrm{Re}\left[\mathbf{L}^H\mathbf{L}\right]\right)^{-1}\left(\mathrm{Re}\left[\mathbf{E}^H\bm{s}\right]+\lambda\mathrm{Re}\left[\mathbf{L}^H\right]\bm{x}^0\right)
+    \label{equ:3.13.0}
 \end{equation}
-这与第二章中Tikhonov正则化的正规方程（\autoref{equ:2.34}）一致。}：
-\begin{equation}
-    \boxed{\hat{\bm{x}} = (\mathbf{E}^H\mathbf{E} + \lambda\bm{\Phi}^H\bm{\Phi})^{-1}(\mathbf{E}^H\bm{s})},
-    \label{equ:3.14}
-\end{equation}
-这可以使用算法1中的共轭梯度（CG）法计算\cite{19-21}。
-
-在更一般的设置中，正则化器$h$对应非二次可微函数。一个广泛用于极小化此类函数的算法是加速梯度法（Accelerated Gradient Method，AGM）\label{term:AGM}\cite{22,11}，其迭代可写为
+本节取$\mathbf{L}$为稀疏变换$\bm{\Phi}$，设无参考图像先验即$\bm{x}^0=\bm{0}$，则\autoref{equ:3.12}中的$g$和$h$分别为\footnote{此处也将目标函数整体进行缩放，而最小值点不改变。}\footnote{对实图像$\bm{x}$，解应取实部即$\hat{\bm{x}}=\left(\mathrm{Re}\left[\mathbf{E}^H\mathbf{E}\right]+\lambda\,\mathrm{Re}\left[\bm{\Phi}^H\bm{\Phi}\right]\right)^{-1}\mathrm{Re}\left[\mathbf{E}^H\bm{s}\right]$。而此处沿用原文表述省略取实部，将解简化为\autoref{equ:3.14}的形式。}
 \begin{align}
-    \bm{x}_t &= \bm{z}_{t-1} - \gamma_t \nabla f(\bm{z}_{t-1}), \label{equ:3.15a} \\
-    \bm{z}_t &= \bm{x}_t + \frac{q_{t-1}-1}{q_t}(\bm{x}_t - \bm{x}_{t-1}), \label{equ:3.15b}
+    &g(\bm{x})=\frac{1}{2}\|\bm{s}-\mathbf{E}\bm{x}\|_2^2\qquad h(\bm{x})=\frac{\lambda}{2}\|\bm{\Phi}\bm{x}\|_2^2 \label{equ:3.13} \\
+    &\Rightarrow\quad\boxed{\hat{\bm{x}}=(\mathbf{E}^H\mathbf{E}+\lambda\bm{\Phi}^H\bm{\Phi})^{-1}(\mathbf{E}^H\bm{s})}
+    \label{equ:3.14}
 \end{align}
-其中$t=1,2,3,\ldots$，$\bm{x}_0=\bm{z}_0\in\mathbb{C}^n$为初始化，$\gamma_t>0$为步长参数。注意，当对所有$t\ge 1$过度松弛参数$q_t=1$时，AGM退化为传统的梯度下降。然而，通过在每次迭代中自适应调整$\{q_t\}$，AGM寻求相对于GD加速收敛。$\{q_t\}$的一个广泛使用的选择是设置为
+\autoref{equ:3.14}的求解可以使用CG法（\autoref{alg:cg1}）。解\autoref{equ:3.14}对应正规方程
 \begin{equation}
-    q_t = \frac{1}{2}\left(1 + \sqrt{1 + 4q_{t-1}^2}\right) \quad \text{从} \quad q_0 = 1 \quad \text{开始}.
+    \mathbf{E}^H\bm{s}=(\mathbf{E}^H\mathbf{E}+\lambda\bm{\Phi}^H\bm{\Phi})\hat{\bm{x}}
+\end{equation}
+对应线性系统算子为$\mathcal{A}=(\mathbf{E}^H\mathbf{E}+\lambda\bm{\Phi}^H\bm{\Phi})$。需要指出，即使$\mathbf{E}$欠采样，Tikhonov正则化项的加入仍保证$\mathcal{A}$的正定性，证明过程见第二章。
+
+而对于非二阶可微正则化项$h$的优化问题，可使用加速梯度法（Accelerated Gradient Method，AGM）\label{term:AGM}，其迭代可写为
+\begin{align}
+    \bm{x}_t&=\bm{z}_{t-1}-\gamma_t\nabla f(\bm{z}_{t-1}) \label{equ:3.15a} \\
+    \bm{z}_t&=\bm{x}_t+\frac{q_{t-1}-1}{q_t}(\bm{x}_t-\bm{x}_{t-1}) \label{equ:3.15b}
+\end{align}
+其中初值$\bm{x}_0=\bm{z}_0\in\mathbb{C}^n$，$\gamma_t>0$为步长。通过在每次迭代中自适应调整$\{q_t\}$，AGM的收敛速度可高于GD法。当$q_t=1$（对所有$t\ge 1$）时，AGM退化为GD法。$\{q_t\}$普遍设置为
+\begin{equation}
+    q_t=\frac{1}{2}\left(1+\sqrt{1+4q_{t-1}^2}\right),\qquad q_0=1
     \label{equ:3.16}
 \end{equation}
+AGM的步长可以通过回溯线搜索自适应调整。给定梯度向量$\nabla f(\bm{z}_{t-1})>0$、初始步长$\gamma_t>0$以及参数$\theta\in(0,1/2]$和$\beta\in(0,1)$，回溯执行
+\begin{equation*}
+    \begin{aligned}
+        \textbf{while}\quad& f\left[\bm{z}_{t-1}-\gamma_t\nabla f(\bm{z}_{t-1})\right]>f(\bm{z}_{t-1})-\theta\gamma_t\|\nabla f(\bm{z}_{t-1})\|_2^2 \\
+        \textbf{do}\quad& \gamma_t\gets\beta\gamma_t
+    \end{aligned}
+\end{equation*}
+对于光滑函数$f$，该while循环在$\gamma_t$充分小后终止。
 
-AGM的步长参数通常固定在一个充分小的值$\gamma>0$，或通过回溯线搜索自适应调整\cite{9}。回溯线搜索寻求确保目标函数在每次迭代中有充分的下降\footnote{回溯线搜索的Armijo条件：给定梯度向量$\nabla f(\bm{z}_{t-1})$、初始步长$\gamma_t>0$以及参数$\theta\in(0,1/2]$和$\beta\in(0,1)$，回溯执行如下：
-\begin{quote}
-\textbf{当} $f(\bm{z}_{t-1} - \gamma_t\nabla f(\bm{z}_{t-1})) > f(\bm{z}_{t-1}) - \theta\gamma_t\|\nabla f(\bm{z}_{t-1})\|_2^2$ \textbf{执行} $\gamma_t \gets \beta\gamma_t$。
-\end{quote}
-对于光滑函数$f$，该while循环保证在$\gamma_t$充分小的值时终止。}。
+接下来讨论AGM的收敛速度。考虑优化问题的以下条件：
+\begin{hypothesis}
+    函数$f=g+h$连续可微且凸。此外，梯度$\nabla f$是Lipschitz连续\footnote{Lipschitz连续：对所有$\bm{x},\bm{y}$，有
+    \begin{equation}
+        \|\nabla f(\bm{x})-\nabla f(\bm{y})\|_2\leq L\|\bm{x}-\bm{y}\|_2
+    \end{equation}
+    其中$L$称为Lipschitz常数，限制了梯度变化的剧烈程度。}的且值为常数$L>0$。
+\end{hypothesis}
+\begin{hypothesis}
+    函数$f$在某个$\bm{x}^*\in\mathbb{C}^n$处存在有限最小值$f^*=f(\bm{x}^*)$，使得$\|\bm{x}_0-\bm{x}^*\|_2\leq R$。
+\end{hypothesis}
+当$f$二次连续可微时，假设1等价于条件$\bm{0}\preceq\mathcal{H}f(\bm{x})\preceq L\mathbf{I}$，其中$\mathcal{H}f(\bm{x})$是$f$的Hessian矩阵。假设2认为最小值点到初值$\bm{x}_0$的距离有界。基于以上两点假设可得：
+\begin{theorem}
+    在假设1、2下，使用固定步长$0<\gamma\leq 1/L$进行$T\ge 1$次AMG迭代，则有
+    \begin{equation}
+        f(\bm{x}_{t-1})-f^*\leq\frac{2R^2}{\gamma(t+1)^2}
+        \label{equ:3.17}
+    \end{equation}
+\end{theorem}
+Nesterov证明，对于光滑凸函数，任何仅使用梯度信息的一阶方法的收敛速度不可能优于$O(1/t^2)$。标准GD仅有$O(1/t)$的收敛速度，而AGM通过\autoref{equ:3.15b}的类“动量”外推可以实现一阶方法的最优$O(1/t^2)$收敛速度。
 
-AGM的收敛速度可针对凸光滑函数进行精确刻画。考虑优化问题的以下条件：
-
-\textbf{假设1.} 函数$f=g+h$连续可微且凸。此外，梯度$\nabla f$是Lipschitz连续的，具有常数$L>0$。
-
-这是优化文献中广泛使用的假设，其简单断定了目标函数的凸性和光滑性。当$f$二次连续可微时，假设1等价于条件$\bm{0}\preceq\nabla^2 f(\bm{x})\preceq L\mathbf{I}$，其中$\nabla^2 f(\bm{x})\in\mathbb{R}^{n\times n}$是$f$的Hessian矩阵\footnote{Lipschitz连续梯度：$\|\nabla f(\bm{x})-\nabla f(\bm{y})\|_2\leq L\|\bm{x}-\bm{y}\|_2$对所有$\bm{x},\bm{y}$成立。$L$称为Lipschitz常数，它限制了梯度变化的剧烈程度。对于二次函数$f(\bm{x})=\frac{1}{2}\|\bm{s}-\mathbf{E}\bm{x}\|_2^2$，有$L=\lambda_{\max}(\mathbf{E}^H\mathbf{E})$。}。
-
-\textbf{假设2.} 函数$f$具有有限最小值$f^*=f(\bm{x}^*)$在某个$\bm{x}^*\in\mathbb{C}^n$处取得，使得$\|\bm{x}_0-\bm{x}^*\|_2\leq R$。
-
-第二个假设简单地断言存在极小值点，其到初始化$\bm{x}_0$的距离有界。我们可以陈述以下著名的收敛结果\cite{11}：
-
-\textbf{定理1.} 在假设1-2下，使用固定步长$0<\gamma\leq 1/L$运行AGM $T\ge 1$次迭代。则该方法的迭代满足
-\begin{equation}
-    \boxed{f(\bm{x}_{t-1}) - f^* \leq \frac{2R^2}{\gamma(t+1)^2}}.
-    \label{equ:3.17}
-\end{equation}
-
-如Nesterov\cite{11}所示，AGM在光滑凸优化中实现了一阶方法的最优$O(1/t^2)$收敛速度\footnote{最优一阶方法：Nesterov的里程碑式结果证明，对于光滑凸函数，任何仅使用梯度信息的一阶方法，其收敛速度不可能优于$O(1/t^2)$。AGM通过巧妙的"动量"外推（\autoref{equ:3.15b}）恰好达到此下界，而标准GD仅有$O(1/t)$的收敛速度。}。优化梯度法（Optimized Gradient Method，OGM）\label{term:OGM}\cite{23}是AGM的一种最新替代方案，具有类似的每次迭代复杂度，但相对于定理1的$2LR^2$，其常数因子$LR^2$更优，可使用步长参数$\gamma=1/L$实现。
-
-\subsection{非光滑优化}
+\subsection{非光滑优化}\label{chap:3.2}
 MRI中许多广泛使用的正则化器$h(\cdot)$是非光滑的。一些著名的例子包括全变分（Total Variation，TV）\label{term:TV}\cite{24,6}、总广义变分（Total Generalized Variation，TGV）\label{term:TGV}\cite{25,26}和Hessian Schatten-范数\cite{27,28}。例如，各向异性TV正则化的MRI重建可用以下项来表述
 \begin{equation}
     g(\bm{x}) = \frac{1}{2}\|\bm{s} - \mathbf{E}\bm{x}\|_2^2 \quad \text{和} \quad h(\bm{x}) = \lambda\|\bm{\Phi}\bm{x}\|_1,
@@ -382,7 +399,7 @@ APGM在凸函数上的收敛行为与AGM相同。为明确陈述，我们假设�
 
 \textbf{定理2.} 在假设3-5下，使用固定步长$0<\gamma\leq 1/L$运行APGM $T\ge 1$次迭代。则该方法的迭代满足
 \begin{equation}
-    \boxed{f(\bm{x}_t) - f^* \leq \frac{2R^2}{\gamma(t+1)^2}}.
+    f(\bm{x}_t) - f^* \leq \frac{2R^2}{\gamma(t+1)^2}
     \label{equ:3.23}
 \end{equation}
 
@@ -443,11 +460,6 @@ $g(\mathbf{E}\bm{x})$可以是非光滑函数，如hinge损失\cite{49}、广义
     \end{algorithmic}
 \end{algorithm}
 
-\subsection{基于随机梯度的方法}
-随机梯度下降（Stochastic Gradient Descent，SGD）\label{term:SGD}方法的随机版本随着神经网络的兴起而变得流行。近年来，SGD方法在求解各种非凸优化问题方面取得了极大的成功。多年来，已提出GD和SGD方法的多种变体以确保更好的收敛性。这些方法包括Nesterov加速梯度（Nesterov Accelerated Gradient，NAG）\label{term:NAG}\cite{59}、Adagrad\cite{60}、RMSprop\cite{61}、Adadelta\cite{62}、自适应矩估计（Adaptive Moment Estimation，ADAM）\label{term:ADAM}\cite{63}和Nesterov加速自适应矩估计（Nesterov-Accelerated Adaptive Moment Estimation，NADAM）\label{term:NADAM}\cite{64}。
-
-Nesterov加速梯度（NAG）将动量项纳入GD更新步骤。随着GD迭代接近局部极小值，更新通常逐渐变小，否则我们将从一个局部极小值附近跳到另一个。为确保这一点，引入了动量项。动量项对梯度指向相同方向的参数增加更新量，对梯度改变方向的参数减少更新量。Adagrad基于特征的出现频率自适应调整参数的学习率。Adagrad对不常出现的特征具有递减的学习率。RMSprop和Adadelta均被开发以解决Adagrad学习率递减的问题。Adam使用梯度的一阶矩和二阶矩进行GD更新。NADAM通过修改动量项将Adam和NAG相结合\footnote{SGD方法总结：（1）SGD —— 最基本的随机优化方法；（2）NAG —— 在SGD中加入Nesterov动量，使更新沿更平滑的轨迹行进；（3）Adagrad —— 自适应学习率，参数相关的学习率反比于历史梯度平方和的平方根；（4）RMSprop/Adadelta —— 用指数移动平均替代Adagrad中的累加求和，解决学习率单调递减问题；（5）Adam —— 结合动量（一阶矩估计）和自适应学习率（二阶矩估计），是目前最广泛使用的优化器之一；（6）NADAM —— 在Adam中融入Nesterov加速，将动量项替换为"向前看"的Nesterov形式。这些方法在基于深度学习的MR重建（如变分网络、深度展开网络）中被广泛应用。}。
-
 \section{小结}
 本章回顾了MRI图像重建背景下若干广泛使用的优化策略。这类算法所需的关键性质是利用关于未知图像$\bm{x}$的有用先验信息的能力。我们讨论了处理光滑和非光滑正则化器的算法。
 
@@ -458,8 +470,6 @@ Nesterov加速梯度（NAG）将动量项纳入GD更新步骤。随着GD迭代�
     \item \textbf{光滑优化：} 当$h$光滑时（如Tikhonov正则化），可使用AGM及其变体，通过Nesterov动量外推达到最优$O(1/t^2)$收敛速度（定理1）。
     \item \textbf{非光滑优化：} 当$h$不可微时（如TV、$\ell_1$正则化），近端算法成为标准工具。PGM通过显式梯度步$+$近端步交替工作，其加速版本APGM/FISTA同样达到$O(1/t^2)$速度（定理2）。ADMM通过变量分裂将原问题转化为约束问题，利用增广Lagrangian交替极小化，在少量迭代内可达到中等精度（定理3）。原始-对偶（Chambolle-Pock）方法通过鞍点表述同时更新原始和对偶变量，对具有复杂线性算子的非光滑项（如$g(\mathbf{E}\bm{x})$）特别有效。
 \end{enumerate}
-
-最后，基于随机梯度的方法（SGD及其变体Adam、NADAM等）结合了动量和自适应学习率，在深度学习驱动的MR重建中发挥着核心作用。这些方法的详细应用将在后续章节中展开。
 
 \newpage
 \appendix
