@@ -339,6 +339,9 @@ INPUT d:/GanJiacheng/apps/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/cmex
 INPUT d:/GanJiacheng/apps/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy5.tfm
 INPUT d:/GanJiacheng/apps/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam5.tfm
 INPUT d:/GanJiacheng/apps/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
+INPUT ./algorithm.png
+INPUT ./algorithm.png
+INPUT ./algorithm.png
 INPUT main.aux
 INPUT ./main.out
 INPUT ./main.out

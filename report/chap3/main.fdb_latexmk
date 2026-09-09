@@ -1,17 +1,18 @@
 # Fdb version 4
-["biber main"] 0 "main.bcf" "main.bbl" "main" 1788862239.06769 0
+["biber main"] 0 "main.bcf" "main.bbl" "main" 1788945343.87033 0
   "main.bcf" 0 -1 0 "xelatex"
   "references.bib" 0 -1 0 ""
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["xdvipdfmx"] 1788862237.77375 "main.xdv" "main.pdf" "main" 1788862239.08074 0
-  "main.xdv" 1788862236 213688 bacae01a39153aa5140aa0707f4ffd7b "xelatex"
+["xdvipdfmx"] 1788945342.12999 "main.xdv" "main.pdf" "main" 1788945343.88205 0
+  "main.xdv" 1788945341 212796 7f3bf08e9f236a67a646f871c6b1183f "xelatex"
   (generated)
   "main.pdf"
   (rewritten before read)
-["xelatex"] 1788862233.3481 "d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap3/main.tex" "main.xdv" "main" 1788862239.06867 0
+["xelatex"] 1788945337.8772 "d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap3/main.tex" "main.xdv" "main" 1788945343.87111 0
+  "algorithm.png" 1788939426 174479 0702406cd08446ff10afe45f350ae723 ""
   "c:/Windows/Fonts/msyh.ttc" 1689123135 19701556 07c864a5b15e68fa47639738197fae38 ""
   "d:/GanJiacheng/apps/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1763637170 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "d:/GanJiacheng/apps/texlive/2025/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1763638728 1528 7e12f4c0fcf5a072cebdcfbfc610f54c ""
@@ -168,12 +169,12 @@
   "d:/GanJiacheng/apps/texlive/2025/texmf-dist/web2c/texmf.cnf" 1763636717 42148 61becc7c670cd061bb319c643c27fdd4 ""
   "d:/GanJiacheng/apps/texlive/2025/texmf-var/web2c/xetex/xelatex.fmt" 1763639114 5640271 6d9938e03d3324a31cc986fb8fbd9d6d ""
   "d:/GanJiacheng/apps/texlive/2025/texmf.cnf" 1763638747 713 e69b156964470283e0530f5060668171 ""
-  "d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap3/main.tex" 1788862232 43638 5ef9c4360dc49342cb86d9d509cca07c ""
-  "main.aux" 1788862236 7372 d9414c84c7d3e0dfeff11997ecb2cfec "xelatex"
+  "d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap3/main.tex" 1788945336 43690 5030f85d2a0f03db7eb9a7c957eace61 ""
+  "main.aux" 1788945341 6438 15a141b69ddbe4d4d35bd8e9c69b9437 "xelatex"
   "main.bbl" 0 -1 0 "biber main"
-  "main.out" 1788862236 1268 d572f4ce0c900969fa55a902b1e7a80d "xelatex"
-  "main.run.xml" 1788862236 2340 0a7a38a0fb9c3fe2eef034f32ea27684 "xelatex"
-  "main.tex" 1788862232 43638 5ef9c4360dc49342cb86d9d509cca07c ""
+  "main.out" 1788945341 1268 d572f4ce0c900969fa55a902b1e7a80d "xelatex"
+  "main.run.xml" 1788945341 2340 0a7a38a0fb9c3fe2eef034f32ea27684 "xelatex"
+  "main.tex" 1788945336 43690 5030f85d2a0f03db7eb9a7c957eace61 ""
   (generated)
   "main.aux"
   "main.bcf"

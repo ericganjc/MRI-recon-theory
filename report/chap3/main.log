@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.20)  8 SEP 2026 18:10
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.20)  9 SEP 2026 17:15
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1023,131 +1023,37 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ]
 
 [2]
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 133.
+
 
 [3]
 
 [4]
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 197.
-
 
 [5]
 
 [6]
+Overfull \hbox (26.64194pt too wide) in paragraph at lines 267--269
+\TU/SimSun(0)/m/n/12 其 中 $\OML/cmm/m/it/12 g$ \TU/SimSun(0)/m/n/12 是 数 据 保 真 项，| $\OML/cmm/m/it/12 h$ \TU/SimSun(0)/m/n/12 是 编 码 先 验 知 识 的 正 则 化 项，| $\OML/cmm/m/it/12 ^^U$ \TU/SimSun(0)/m/n/12 是 正 则 化 参 数。|  本 节 讨 论 正 则 化 问 题[][]\TU/lmr/m/n/12 Equation 26[][][]\TU/SimSun(0)/m/n/12 的
+ []
+
+
 
 [7]
 
-LaTeX Warning: Citation '24' on page 8 undefined on input line 320.
-
-
-LaTeX Warning: Citation '6' on page 8 undefined on input line 320.
-
-
-LaTeX Warning: Citation '25' on page 8 undefined on input line 320.
-
-
-LaTeX Warning: Citation '26' on page 8 undefined on input line 320.
-
-
-LaTeX Warning: Citation '27' on page 8 undefined on input line 320.
-
-
-LaTeX Warning: Citation '28' on page 8 undefined on input line 320.
-
-
-
 [8]
-
-LaTeX Warning: Citation '29' on page 9 undefined on input line 327.
-
-
-LaTeX Warning: Citation '30-33' on page 9 undefined on input line 327.
-
-
-LaTeX Warning: Citation '34-36' on page 9 undefined on input line 327.
-
-
-LaTeX Warning: Citation '37' on page 9 undefined on input line 327.
-
-
-LaTeX Warning: Citation '38' on page 9 undefined on input line 332.
-
-
-LaTeX Warning: Citation '39' on page 9 undefined on input line 355.
-
-
-LaTeX Warning: Citation '40' on page 9 undefined on input line 359.
-
-
 
 [9]
 
-LaTeX Warning: Citation '33' on page 10 undefined on input line 398.
-
-
-LaTeX Warning: Citation '34-36' on page 10 undefined on input line 408.
-
-
-LaTeX Warning: Citation '40' on page 10 undefined on input line 408.
-
-
-
 [10]
 
-LaTeX Warning: Citation '40' on page 11 undefined on input line 414.
+LaTeX Font Warning: Font shape `TU/SimSun(0)/b/it' undefined
+(Font)              using `TU/SimSun(0)/b/n' instead on input line 448.
 
+File: algorithm.png Graphic file (type bmp)
+<algorithm.png>
 
-LaTeX Warning: Citation '40' on page 11 undefined on input line 428.
-
-
-LaTeX Warning: Citation '41' on page 11 undefined on input line 437.
-
-
-LaTeX Warning: Citation '9' on page 11 undefined on input line 442.
-
-
-LaTeX Warning: Citation '41-48' on page 11 undefined on input line 442.
-
-
-LaTeX Warning: Citation '49' on page 11 undefined on input line 444.
-
-
-LaTeX Warning: Citation '50' on page 11 undefined on input line 444.
-
-
-LaTeX Warning: Citation '51' on page 11 undefined on input line 444.
-
-
-LaTeX Warning: Citation '52' on page 11 undefined on input line 444.
-
-
-LaTeX Warning: Citation '53' on page 11 undefined on input line 444.
-
-
-LaTeX Warning: Citation '54' on page 11 undefined on input line 444.
-
-
-LaTeX Warning: Citation '55' on page 11 undefined on input line 444.
-
-
-LaTeX Warning: Citation '56' on page 11 undefined on input line 444.
-
-
-LaTeX Warning: Citation '57' on page 11 undefined on input line 444.
-
-
-LaTeX Warning: Citation '58' on page 11 undefined on input line 444.
-
-
-LaTeX Warning: Citation '41' on page 11 undefined on input line 448.
-
-
-LaTeX Warning: Citation '42' on page 11 undefined on input line 448.
-
-
-LaTeX Warning: Citation '41' on page 11 undefined on input line 448.
-
-
-LaTeX Warning: Citation '42' on page 11 undefined on input line 448.
+LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 
@@ -1157,33 +1063,38 @@ LaTeX Warning: Citation '42' on page 11 undefined on input line 448.
 
 [13]
 
-LaTeX Warning: Reference `term:MAP' on page 14 undefined on input line 559.
+[14]
+
+LaTeX Warning: Reference `term:MAP' on page 15 undefined on input line 592.
 
 
-LaTeX Warning: Reference `term:OGM' on page 14 undefined on input line 559.
+LaTeX Warning: Reference `term:OGM' on page 15 undefined on input line 592.
 
 
-LaTeX Warning: Reference `term:SGD' on page 14 undefined on input line 559.
+LaTeX Warning: Reference `term:SGD' on page 15 undefined on input line 592.
 
 
-LaTeX Warning: Reference `term:NAG' on page 14 undefined on input line 559.
+LaTeX Warning: Reference `term:NAG' on page 15 undefined on input line 592.
 
 
-LaTeX Warning: Reference `term:ADAM' on page 14 undefined on input line 559.
+LaTeX Warning: Reference `term:ADAM' on page 15 undefined on input line 592.
 
 
-LaTeX Warning: Reference `term:NADAM' on page 14 undefined on input line 559.
+LaTeX Warning: Reference `term:NADAM' on page 15 undefined on input line 592.
 
 
-LaTeX Warning: Empty bibliography on input line 562.
+LaTeX Warning: Empty bibliography on input line 595.
 
 
 
-[14] (./main.aux)
+[15] (./main.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2022/08/05>
  ***********
+
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 
 LaTeX Warning: There were undefined references.
@@ -1200,12 +1111,12 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 31756 strings out of 473832
- 704275 string characters out of 5725354
- 1513123 words of memory out of 5000000
- 54430 multiletter control sequences out of 15000+600000
- 577998 words of font info for 146 fonts, out of 8000000 for 9000
+ 31574 strings out of 473832
+ 699766 string characters out of 5725354
+ 1510061 words of memory out of 5000000
+ 54245 multiletter control sequences out of 15000+600000
+ 578006 words of font info for 147 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 93i,15n,111p,1233b,1648s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 93i,15n,111p,1233b,1149s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.xdv (14 pages, 213688 bytes).
+Output written on main.xdv (15 pages, 212796 bytes).
