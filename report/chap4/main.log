@@ -1,10 +1,10 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.20)  9 SEP 2026 17:15
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.20)  10 SEP 2026 19:03
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap3/main.tex
-(d:/GanJiacheng/files/PhD/MRI图像重构理论方法应用/report/chap3/main.tex
+**main
+(./main.tex
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
 (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/base/article.cls
@@ -573,284 +573,14 @@ Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
-)) (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/amscls/amsthm.sty
-Package: amsthm 2020/05/29 v2.20.6
-\thm@style=\toks27
-\thm@bodyfont=\toks28
-\thm@headfont=\toks29
-\thm@notefont=\toks30
-\thm@headpunct=\toks31
-\thm@preskip=\skip69
-\thm@postskip=\skip70
-\thm@headsep=\skip71
-\dth@everypar=\toks32
-)
-\c@theorem=\count361
-\c@hypothesis=\count362
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/algorithms/algorithm.sty
-Invalid UTF-8 byte or sequence at line 11 replaced by U+FFFD.
-Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating environment
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/float/float.sty
-Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count363
-\float@exts=\toks33
-\float@box=\box72
-\@float@everytoks=\toks34
-\@floatcapt=\box73
-) (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/base/ifthen.sty
-Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
-)
-\@float@every@algorithm=\toks35
-\c@algorithm=\count364
-) (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/algorithmicx/algpseudocode.sty
-Package: algpseudocode 
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/algorithmicx/algorithmicx.sty
-Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
-
-Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
-\c@ALG@line=\count365
-\c@ALG@rem=\count366
-\c@ALG@nested=\count367
-\ALG@tlm=\skip72
-\ALG@thistlm=\skip73
-\c@ALG@Lnr=\count368
-\c@ALG@blocknr=\count369
-\c@ALG@storecount=\count370
-\c@ALG@tmpcounter=\count371
-\ALG@tmplength=\skip74
-)
-Document Style - pseudocode environments for use with the `algorithmicx' style
-) (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/biblatex/biblatex.sty
-Package: biblatex 2024/03/21 v3.20 programmable bibliographies (PK/MW)
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/logreq/logreq.sty
-Package: logreq 2010/08/04 v1.0 xml request logger
-\lrq@indent=\count372
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/logreq/logreq.def
-File: logreq.def 2010/08/04 v1.0 logreq spec v1.0
-))
-\c@tabx@nest=\count373
-\c@listtotal=\count374
-\c@listcount=\count375
-\c@liststart=\count376
-\c@liststop=\count377
-\c@citecount=\count378
-\c@citetotal=\count379
-\c@multicitecount=\count380
-\c@multicitetotal=\count381
-\c@instcount=\count382
-\c@maxnames=\count383
-\c@minnames=\count384
-\c@maxitems=\count385
-\c@minitems=\count386
-\c@citecounter=\count387
-\c@maxcitecounter=\count388
-\c@savedcitecounter=\count389
-\c@uniquelist=\count390
-\c@uniquename=\count391
-\c@refsection=\count392
-\c@refsegment=\count393
-\c@maxextratitle=\count394
-\c@maxextratitleyear=\count395
-\c@maxextraname=\count396
-\c@maxextradate=\count397
-\c@maxextraalpha=\count398
-\c@abbrvpenalty=\count399
-\c@highnamepenalty=\count400
-\c@lownamepenalty=\count401
-\c@maxparens=\count402
-\c@parenlevel=\count403
-\blx@tempcnta=\count404
-\blx@tempcntb=\count405
-\blx@tempcntc=\count406
-\c@blx@maxsection=\count407
-\blx@maxsegment@0=\count408
-\blx@notetype=\count409
-\blx@parenlevel@text=\count410
-\blx@parenlevel@foot=\count411
-\blx@sectionciteorder@0=\count412
-\blx@sectionciteorderinternal@0=\count413
-\blx@entrysetcounter=\count414
-\blx@biblioinstance=\count415
-\labelnumberwidth=\skip75
-\labelalphawidth=\skip76
-\biblabelsep=\skip77
-\bibitemsep=\skip78
-\bibnamesep=\skip79
-\bibinitsep=\skip80
-\bibparsep=\skip81
-\bibhang=\skip82
-\blx@bcfin=\read2
-\blx@bcfout=\write3
-\blx@langwohyphens=\language90
-\c@mincomprange=\count416
-\c@maxcomprange=\count417
-\c@mincompwidth=\count418
-Package biblatex Info: Trying to load biblatex default data model...
-Package biblatex Info: ... file 'blx-dm.def' found.
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/biblatex/blx-dm.def
-File: blx-dm.def 2024/03/21 v3.20 biblatex datamodel (PK/MW)
-)
-Package biblatex Info: Trying to load biblatex style data model...
-Package biblatex Info: ... file 'numeric.dbx' not found.
-Package biblatex Info: Trying to load biblatex custom data model...
-Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
-\c@afterword=\count419
-\c@savedafterword=\count420
-\c@annotator=\count421
-\c@savedannotator=\count422
-\c@author=\count423
-\c@savedauthor=\count424
-\c@bookauthor=\count425
-\c@savedbookauthor=\count426
-\c@commentator=\count427
-\c@savedcommentator=\count428
-\c@editor=\count429
-\c@savededitor=\count430
-\c@editora=\count431
-\c@savededitora=\count432
-\c@editorb=\count433
-\c@savededitorb=\count434
-\c@editorc=\count435
-\c@savededitorc=\count436
-\c@foreword=\count437
-\c@savedforeword=\count438
-\c@holder=\count439
-\c@savedholder=\count440
-\c@introduction=\count441
-\c@savedintroduction=\count442
-\c@namea=\count443
-\c@savednamea=\count444
-\c@nameb=\count445
-\c@savednameb=\count446
-\c@namec=\count447
-\c@savednamec=\count448
-\c@translator=\count449
-\c@savedtranslator=\count450
-\c@shortauthor=\count451
-\c@savedshortauthor=\count452
-\c@shorteditor=\count453
-\c@savedshorteditor=\count454
-\c@labelname=\count455
-\c@savedlabelname=\count456
-\c@institution=\count457
-\c@savedinstitution=\count458
-\c@lista=\count459
-\c@savedlista=\count460
-\c@listb=\count461
-\c@savedlistb=\count462
-\c@listc=\count463
-\c@savedlistc=\count464
-\c@listd=\count465
-\c@savedlistd=\count466
-\c@liste=\count467
-\c@savedliste=\count468
-\c@listf=\count469
-\c@savedlistf=\count470
-\c@location=\count471
-\c@savedlocation=\count472
-\c@organization=\count473
-\c@savedorganization=\count474
-\c@origlocation=\count475
-\c@savedoriglocation=\count476
-\c@origpublisher=\count477
-\c@savedorigpublisher=\count478
-\c@publisher=\count479
-\c@savedpublisher=\count480
-\c@language=\count481
-\c@savedlanguage=\count482
-\c@origlanguage=\count483
-\c@savedoriglanguage=\count484
-\c@pageref=\count485
-\c@savedpageref=\count486
-\shorthandwidth=\skip83
-\shortjournalwidth=\skip84
-\shortserieswidth=\skip85
-\shorttitlewidth=\skip86
-\shortauthorwidth=\skip87
-\shorteditorwidth=\skip88
-\locallabelnumberwidth=\skip89
-\locallabelalphawidth=\skip90
-\localshorthandwidth=\skip91
-\localshortjournalwidth=\skip92
-\localshortserieswidth=\skip93
-\localshorttitlewidth=\skip94
-\localshortauthorwidth=\skip95
-\localshorteditorwidth=\skip96
-Package biblatex Info: Trying to load enhanced support for Unicode engines...
-Package biblatex Info: ... file 'blx-unicode.def' found.
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/biblatex/blx-unicode.def)
-Package biblatex Info: Trying to load compatibility code...
-Package biblatex Info: ... file 'blx-compat.def' found.
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/biblatex/blx-compat.def
-File: blx-compat.def 2024/03/21 v3.20 biblatex compatibility (PK/MW)
-)
-Package biblatex Info: Trying to load generic definitions...
-Package biblatex Info: ... file 'biblatex.def' found.
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/biblatex/biblatex.def
-File: biblatex.def 2024/03/21 v3.20 biblatex compatibility (PK/MW)
-\c@textcitecount=\count487
-\c@textcitetotal=\count488
-\c@textcitemaxnames=\count489
-\c@biburlbigbreakpenalty=\count490
-\c@biburlbreakpenalty=\count491
-\c@biburlnumpenalty=\count492
-\c@biburlucpenalty=\count493
-\c@biburllcpenalty=\count494
-\biburlbigskip=\muskip19
-\biburlnumskip=\muskip20
-\biburlucskip=\muskip21
-\biburllcskip=\muskip22
-\c@smartand=\count495
-)
-Package biblatex Info: Trying to load bibliography style 'numeric'...
-Package biblatex Info: ... file 'numeric.bbx' found.
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/biblatex/bbx/numeric.bbx
-File: numeric.bbx 2024/03/21 v3.20 biblatex bibliography style (PK/MW)
-Package biblatex Info: Trying to load bibliography style 'standard'...
-Package biblatex Info: ... file 'standard.bbx' found.
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/biblatex/bbx/standard.bbx
-File: standard.bbx 2024/03/21 v3.20 biblatex bibliography style (PK/MW)
-\c@bbx:relatedcount=\count496
-\c@bbx:relatedtotal=\count497
-))
-Package biblatex Info: Trying to load citation style 'numeric'...
-Package biblatex Info: ... file 'numeric.cbx' found.
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/biblatex/cbx/numeric.cbx
-File: numeric.cbx 2024/03/21 v3.20 biblatex citation style (PK/MW)
-Package biblatex Info: Redefining '\cite'.
-Package biblatex Info: Redefining '\parencite'.
-Package biblatex Info: Redefining '\footcite'.
-Package biblatex Info: Redefining '\footcitetext'.
-Package biblatex Info: Redefining '\smartcite'.
-Package biblatex Info: Redefining '\supercite'.
-Package biblatex Info: Redefining '\textcite'.
-Package biblatex Info: Redefining '\textcites'.
-Package biblatex Info: Redefining '\cites'.
-Package biblatex Info: Redefining '\parencites'.
-Package biblatex Info: Redefining '\smartcites'.
-)
-Package biblatex Info: Trying to load configuration file...
-Package biblatex Info: ... file 'biblatex.cfg' found.
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/biblatex/biblatex.cfg
-File: biblatex.cfg 
-)
-Package biblatex Info: XeTeX detected.
-(biblatex)             Assuming input encoding 'utf8'.
-Package biblatex Info: Document encoding is UTF8 ....
-Package biblatex Info: ... and expl3
-(biblatex)             2025-01-18 L3 programming layer (loader) 
-(biblatex)             is new enough (at least 2020/04/06),
-(biblatex)             setting 'casechanger=expl3'.
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/biblatex/blx-case-expl3.sty
-Package: blx-case-expl3 2024/03/21 v3.20 expl3 case changing code for biblatex
 )) (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/geometry/geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
  (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/generic/iftex/ifvtex.sty
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 )
-\Gm@cnth=\count498
-\Gm@cntv=\count499
-\c@Gm@tempcnt=\count500
+\Gm@cnth=\count361
+\Gm@cntv=\count362
+\c@Gm@tempcnt=\count363
 \Gm@bindingoffset=\dimen294
 \Gm@wd@mp=\dimen295
 \Gm@odd@mp=\dimen296
@@ -859,34 +589,32 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@layoutheight=\dimen299
 \Gm@layouthoffset=\dimen300
 \Gm@layoutvoffset=\dimen301
-\Gm@dimlist=\toks36
+\Gm@dimlist=\toks27
 )
-Package translations Info: No language package found. I am going to use `english' as default language. on input line 58.
-\@quotelevel=\count501
-\@quotereset=\count502
+Package translations Info: No language package found. I am going to use `english' as default language. on input line 34.
  (./main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
 
 Package fontspec Info: 
 (fontspec)             Adjusting the maths setup (use [no-math] to avoid
@@ -894,87 +622,70 @@ Package fontspec Info:
 
 \symlegacymaths=\mathgroup9
 LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
-(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 58.
-LaTeX Font Info:    Redeclaring math accent \acute on input line 58.
-LaTeX Font Info:    Redeclaring math accent \grave on input line 58.
-LaTeX Font Info:    Redeclaring math accent \ddot on input line 58.
-LaTeX Font Info:    Redeclaring math accent \tilde on input line 58.
-LaTeX Font Info:    Redeclaring math accent \bar on input line 58.
-LaTeX Font Info:    Redeclaring math accent \breve on input line 58.
-LaTeX Font Info:    Redeclaring math accent \check on input line 58.
-LaTeX Font Info:    Redeclaring math accent \hat on input line 58.
-LaTeX Font Info:    Redeclaring math accent \dot on input line 58.
-LaTeX Font Info:    Redeclaring math accent \mathring on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \Delta on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \Theta on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \Xi on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \Pi on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \Phi on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \Psi on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \Omega on input line 58.
-LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 58.
-LaTeX Font Info:    Redeclaring symbol font `operators' on input line 58.
+(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 34.
+LaTeX Font Info:    Redeclaring math accent \acute on input line 34.
+LaTeX Font Info:    Redeclaring math accent \grave on input line 34.
+LaTeX Font Info:    Redeclaring math accent \ddot on input line 34.
+LaTeX Font Info:    Redeclaring math accent \tilde on input line 34.
+LaTeX Font Info:    Redeclaring math accent \bar on input line 34.
+LaTeX Font Info:    Redeclaring math accent \breve on input line 34.
+LaTeX Font Info:    Redeclaring math accent \check on input line 34.
+LaTeX Font Info:    Redeclaring math accent \hat on input line 34.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 34.
+LaTeX Font Info:    Redeclaring math accent \mathring on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 34.
+LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 34.
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 34.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `normal' on input line 58.
+(Font)              `operators' in the math version `normal' on input line 34.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  OT1/cmr/m/n --> TU/lmr/m/n on input line 58.
+(Font)                  OT1/cmr/m/n --> TU/lmr/m/n on input line 34.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `bold' on input line 58.
+(Font)              `operators' in the math version `bold' on input line 34.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  OT1/cmr/bx/n --> TU/lmr/m/n on input line 58.
+(Font)                  OT1/cmr/bx/n --> TU/lmr/m/n on input line 34.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  TU/lmr/m/n --> TU/lmr/m/n on input line 58.
+(Font)                  TU/lmr/m/n --> TU/lmr/m/n on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> TU/lmr/m/it on input line 58.
+(Font)                  OT1/cmr/m/it --> TU/lmr/m/it on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> TU/lmr/b/n on input line 58.
+(Font)                  OT1/cmr/bx/n --> TU/lmr/b/n on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 58.
+(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 58.
+(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 34.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  TU/lmr/m/n --> TU/lmr/b/n on input line 58.
+(Font)                  TU/lmr/m/n --> TU/lmr/b/n on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
-(Font)                  OT1/cmr/bx/it --> TU/lmr/b/it on input line 58.
+(Font)                  OT1/cmr/bx/it --> TU/lmr/b/it on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> TU/lmss/b/n on input line 58.
+(Font)                  OT1/cmss/bx/n --> TU/lmss/b/n on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/b/n on input line 58.
-Package hyperref Info: Link coloring ON on input line 58.
+(Font)                  OT1/cmtt/m/n --> TU/lmtt/b/n on input line 34.
+Package hyperref Info: Link coloring ON on input line 34.
  (./main.out) (./main.out)
-\@outlinefile=\write4
-\openout4 = `main.out'.
+\@outlinefile=\write3
+\openout3 = `main.out'.
 
 Package caption Info: Begin \AtBeginDocument code.
-Package caption Info: float package is loaded.
 Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
-\c@lstlisting=\count503
+\c@lstlisting=\count364
  (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/translations/translations-basic-dictionary-english.trsl
 File: translations-basic-dictionary-english.trsl (english translation file `translations-basic-dictionary')
 )
-Package translations Info: loading dictionary `translations-basic-dictionary' for `english'. on input line 58.
-Package biblatex Info: Trying to load language 'english'...
-Package biblatex Info: ... file 'english.lbx' found.
- (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/biblatex/lbx/english.lbx
-File: english.lbx 2024/03/21 v3.20 biblatex localization (PK/MW)
-)
-Package biblatex Info: XeTeX detected.
-(biblatex)             Assuming input encoding 'utf8'.
-Package biblatex Info: Automatic encoding selection.
-(biblatex)             Assuming data encoding 'utf8'.
-\openout3 = `main.bcf'.
+Package translations Info: loading dictionary `translations-basic-dictionary' for `english'. on input line 34.
 
-Package biblatex Info: Trying to load bibliographic data...
-Package biblatex Info: ... file 'main.bbl' not found.
-
-No file main.bbl.
-Package biblatex Info: Reference section=0 on input line 58.
-Package biblatex Info: Reference segment=0 on input line 58.
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
 *geometry* verbose mode - [ preamble ] result:
@@ -1009,11 +720,11 @@ Package biblatex Info: Reference segment=0 on input line 58.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 61.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 37.
 (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 61.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 37.
  (d:/GanJiacheng/apps/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
@@ -1021,9 +732,13 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 [1
 
 ]
+File: fig4-1.png Graphic file (type bmp)
+<fig4-1.png>
+
 
 [2]
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 133.
+File: fig4-2.png Graphic file (type bmp)
+<fig4-2.png>
 
 
 [3]
@@ -1033,29 +748,19 @@ Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on inp
 [5]
 
 [6]
-Overfull \hbox (26.64194pt too wide) in paragraph at lines 267--269
-\TU/SimSun(0)/m/n/12 其 中 $\OML/cmm/m/it/12 g$ \TU/SimSun(0)/m/n/12 是 数 据 保 真 项，| $\OML/cmm/m/it/12 h$ \TU/SimSun(0)/m/n/12 是 编 码 先 验 知 识 的 正 则 化 项，| $\OML/cmm/m/it/12 ^^U$ \TU/SimSun(0)/m/n/12 是 正 则 化 参 数。|  本 节 讨 论 正 则 化 问 题[][]\TU/lmr/m/n/12 Equation 26[][][]\TU/SimSun(0)/m/n/12 的
- []
-
-
 
 [7]
+File: fig4-3.png Graphic file (type bmp)
+<fig4-3.png>
+File: fig4-4.png Graphic file (type bmp)
+<fig4-4.png>
+
 
 [8]
 
 [9]
 
 [10]
-
-LaTeX Font Warning: Font shape `TU/SimSun(0)/b/it' undefined
-(Font)              using `TU/SimSun(0)/b/n' instead on input line 448.
-
-File: algorithm.png Graphic file (type bmp)
-<algorithm.png>
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
 
 [11]
 
@@ -1064,59 +769,104 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 [13]
 
 [14]
-
-LaTeX Warning: Reference `term:MAP' on page 15 undefined on input line 592.
-
-
-LaTeX Warning: Reference `term:OGM' on page 15 undefined on input line 592.
-
-
-LaTeX Warning: Reference `term:SGD' on page 15 undefined on input line 592.
+File: fig4-5.png Graphic file (type bmp)
+<fig4-5.png>
+File: fig4-6.png Graphic file (type bmp)
+<fig4-6.png>
 
 
-LaTeX Warning: Reference `term:NAG' on page 15 undefined on input line 592.
+[15]
+File: fig4-7.png Graphic file (type bmp)
+<fig4-7.png>
+File: fig4-8.png Graphic file (type bmp)
+<fig4-8.png>
+File: fig4-9.png Graphic file (type bmp)
+<fig4-9.png>
+File: fig4-10.png Graphic file (type bmp)
+<fig4-10.png>
 
 
-LaTeX Warning: Reference `term:ADAM' on page 15 undefined on input line 592.
+[16]
+File: fig4-11.png Graphic file (type bmp)
+<fig4-11.png>
+File: fig4-12.png Graphic file (type bmp)
+<fig4-12.png>
+File: fig4-13.png Graphic file (type bmp)
+<fig4-13.png>
 
 
-LaTeX Warning: Reference `term:NADAM' on page 15 undefined on input line 592.
+[17]
+File: fig4-14.png Graphic file (type bmp)
+<fig4-14.png>
+File: fig4-15.png Graphic file (type bmp)
+<fig4-15.png>
+File: fig4-16.png Graphic file (type bmp)
+<fig4-16.png>
+File: fig4-17.png Graphic file (type bmp)
+<fig4-17.png>
 
 
-LaTeX Warning: Empty bibliography on input line 595.
+[18]
+
+[19]
+File: fig4-18.png Graphic file (type bmp)
+<fig4-18.png>
+File: fig4-19.png Graphic file (type bmp)
+<fig4-19.png>
+
+
+[20]
+
+[21]
+
+[22]
+
+[23]
+
+[24]
+
+[25]
+
+[26]
+
+[27]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 
-[15] (./main.aux)
+[28]
+Underfull \hbox (badness 5161) in paragraph at lines 877--877
+[]|\TU/lmr/m/n/10.95 Periodically Rotated Overlapping Parallel
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+
+[29]
+
+[30]
+
+[31] (./main.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2022/08/05>
  ***********
-
-
-LaTeX Font Warning: Some font shapes were not available, defaults substituted.
-
-
-LaTeX Warning: There were undefined references.
-
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: D572F4CE0C900969FA55A902B1E7A80D;1268.
-
-Package biblatex Warning: Please (re)run Biber on the file:
-(biblatex)                main
-(biblatex)                and rerun LaTeX afterwards.
-
-Package logreq Info: Writing requests to 'main.run.xml'.
-\openout1 = `main.run.xml'.
-
+(rerunfilecheck)             Checksum: E8CA19D27760C5D02088C5982ED8207B;888.
  ) 
 Here is how much of TeX's memory you used:
- 31574 strings out of 473832
- 699766 string characters out of 5725354
- 1510061 words of memory out of 5000000
- 54245 multiletter control sequences out of 15000+600000
- 578006 words of font info for 147 fonts, out of 8000000 for 9000
+ 23915 strings out of 473832
+ 542019 string characters out of 5725354
+ 923862 words of memory out of 5000000
+ 46649 multiletter control sequences out of 15000+600000
+ 577942 words of font info for 139 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 93i,15n,111p,1233b,1149s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 93i,12n,111p,558b,950s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.xdv (15 pages, 212796 bytes).
+Output written on main.pdf (31 pages).

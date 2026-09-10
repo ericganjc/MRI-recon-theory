@@ -3,7 +3,37 @@
     "allow": [
       "Bash(python -c ' *)",
       "Bash(xelatex -interaction=nonstopmode main.tex)",
-      "Bash(grep -n \"\\\\\\\\\\\\\\\\label\\\\\\\\|\\\\\\\\\\\\\\\\boxed\\\\\\\\|\\\\\\\\\\\\\\\\begin{equation}\\\\\\\\|\\\\\\\\\\\\\\\\begin{align}\" main.tex)"
+      "Bash(grep -n \"\\\\\\\\\\\\\\\\label\\\\\\\\|\\\\\\\\\\\\\\\\boxed\\\\\\\\|\\\\\\\\\\\\\\\\begin{equation}\\\\\\\\|\\\\\\\\\\\\\\\\begin{align}\" main.tex)",
+      "Bash(env)",
+      "Bash(sed 's/\\\\\\(KEY=\\\\\\).*/\\\\1***/')",
+      "Bash(python -c \"import json;d=json.load\\(open\\(r'C:/Users/15611/.claude.json'\\)\\);print\\([k for k in d.keys\\(\\)]\\)\")",
+      "Bash(export MSYS_NO_PATHCONV=1)",
+      "Bash(reg add *)",
+      "Bash(echo \"=== 注册表 HKCU\\\\\\\\Environment 现状 ===\")",
+      "Bash(reg query *)",
+      "Bash(sed 's/\\\\\\(TOKEN[ ]*REG_SZ[ ]*\\\\\\).*/\\\\1***/')",
+      "Bash(python -c \"import json;d=json.load\\(open\\(r'C:/Users/15611/.claude/settings.json'\\)\\);print\\('OK, model =',d['model'],'| permissions keys =',list\\(d['permissions'].keys\\(\\)\\)\\)\")",
+      "Bash(node -e \"const d=require\\('C:/Users/15611/.claude/settings.json'\\);console.log\\('OK, model =',d.model\\)\")",
+      "Bash(setx ANTHROPIC_MODEL \"deepseek-flash[1m]\")",
+      "Bash(setx ANTHROPIC_DEFAULT_OPUS_MODEL \"deepseek-flash[1m]\")",
+      "Bash(setx ANTHROPIC_DEFAULT_SONNET_MODEL \"deepseek-flash[1m]\")",
+      "Bash(setx ANTHROPIC_DEFAULT_HAIKU_MODEL \"deepseek-flash\")",
+      "Bash(setx CLAUDE_CODE_SUBAGENT_MODEL \"deepseek-flash\")",
+      "Bash(xargs echo \"含 deepseek-flash 的条目数:\")",
+      "Read(//c//**)",
+      "Bash(xargs echo \"WinSxS\\(注意:不可直接删\\):\")",
+      "Bash(wmic computersystem *)",
+      "Bash(awk '{printf \"%.1f GB\\\\n\", $1/1024/1024/1024}')",
+      "Bash(wmic systemenclosure *)",
+      "Bash(powercfg /a)",
+      "Bash(powercfg /q SCHEME_CURRENT SUB_BUTTONS)",
+      "Bash(tasklist /FI \"IMAGENAME eq wemeetapp.exe\")",
+      "Bash(xargs echo \"wemeetapp 进程数:\")",
+      "Bash(robocopy \"D:\\\\\\\\GanJiacheng\" \"C:\\\\\\\\__nul__\" /L /S /NJH /BYTES /NFL /NDL /XJ)",
+      "Bash(wmic pagefileset *)",
+      "Bash(echo \"=== D:\\\\\\\\GanJiacheng\\\\\\\\apps\\\\\\\\WeChat \\(旧版微信\\) 内容 ===\")",
+      "Bash(wmic process *)",
+      "Bash(echo \"=== apps\\\\\\\\Weixin \\(现役\\) 内容 ===\")"
     ]
   }
 }
